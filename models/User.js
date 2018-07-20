@@ -2,8 +2,24 @@ import Sequelize from 'sequelize';
 
 export default (sequelize) => {
   return sequelize.define('User', {
+    twitterId: {
+      type: Sequelize.STRING,
+      defaultValue: null,
+    },
     facebookId: {
-      type: Sequelize.BIGINT,
+      type: Sequelize.STRING,
+      defaultValue: null,
+    },
+    instagramId: {
+      type: Sequelize.STRING,
+      defaultValue: null,
+    },
+    googleId: {
+      type: Sequelize.STRING,
+      defaultValue: null,
+    },
+    vkId: {
+      type: Sequelize.STRING,
       defaultValue: null,
     },
     login: Sequelize.STRING,

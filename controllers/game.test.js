@@ -1,4 +1,4 @@
-import db from '../helpers/db';
+import db from '../services/db';
 import GameCtrl from './game';
 import { mockUser, mockGameUser, mockGame, mockTask, mockGameAction, mockWs } from '../mocks';
 

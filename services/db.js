@@ -17,7 +17,7 @@ export default () => {
   const db = models(dbConnection);
 
   dbConnection.sync().then(() => {
-    console.log('sync success');
+    console.log('db sync success');
   });
   return db;
 };

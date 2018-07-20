@@ -1,8 +1,6 @@
-import passport from 'passport';
 import UserCtrl from '../controllers/user';
 import SignInHandler from '../handlers/sign-in';
 import SignUpHandler from '../handlers/sign-up';
-
 
 const authorization = (req, res, next) => {
   if (!req.isAuthenticated()) {
@@ -25,17 +23,4 @@ export default (app, db) => {
   app.post('/sign-up', signUpHandler.run.bind(signUpHandler));
   app.get('/user', authorization, (req, res) => res.send(req.user.toJSON()));
   app.get('/logout', authorization, (req, res) => res.send(req.logout()));
-
-  app.get('/auth/facebook', passport.authenticate('facebook'));
-
-  app.get(
-    '/auth/facebook/callback',
-    passport.authenticate(
-      'facebook',
-      {
-        failureRedirect: `${process.env.CLIENT_BASE_URL}/login`,
-        successRedirect: `${process.env.CLIENT_BASE_URL}/`,
-      },
-    ),
-  );
 };

@@ -1,4 +1,4 @@
-import db from '../helpers/db';
+import db from '../services/db';
 import UserCtrl from './user';
 import { mockUser } from '../mocks';
 

@@ -1,52 +1,61 @@
-import url from 'url';
-import jwt from 'jsonwebtoken';
+import WebSocket from 'ws';
+import passport from 'passport';
 import { wsGenerateMessage, wsParseMessage } from 'pty-common/ws-message';
-import { JWT_SECRET } from '../config';
 
 export default class WS {
-  constructor(wsServer, db) {
-    this.wsServer = wsServer;
+  static getWsServerConfig({ server, sessionParser }) {
+    return {
+      port: 5001,
+      perMessageDeflate: false,
+      server,
+      verifyClient: ({ req }, done) => {
+        sessionParser(req, {}, () => {
+          passport.initialize()(req, {}, () => {
+            passport.session()(req, {}, () => {
+              done(!!req.user);
+            });
+          });
+        });
+      },
+    };
+  }
+
+  constructor({ server, db, sessionParser }) {
+    this.wsServer = new WebSocket.Server(WS.getWsServerConfig({ server, sessionParser }));
     this.db = db;
     this.messageEventMap = {};
     this.userIdSocketMap = {};
 
-    this.connectionHandler();
-  }
-
-  connectionHandler() {
-    this.wsServer.on('connection', async (socket) => {
-      const { query: { token } } = url.parse(socket.upgradeReq.url, true);
-      const userData = jwt.verify(token, JWT_SECRET);
-
-      const user = await this.db.User.findOne({ where: { id: userData.id } });
-
-      if (user) {
-        this.send(user.id, 'LOG_OUT');
-
-        setTimeout(() => {
-          this.userIdSocketMap[userData.id] = socket;
-
-          this.assignEvents(socket);
-
-          socket.send(wsGenerateMessage('SUBSCRIBED', user));
-        }, 1000);
-      }
+    this.wsServer.on('connection', (socket, req) => {
+      this.handshakeCb({ socket, req });
     });
   }
 
+
+  handshakeCb({ socket, req: { user } }) {
+    this.send(user.id, 'LOG_OUT');
+    setTimeout(() => {
+      this.userIdSocketMap[user.id] = socket;
+      this.initMessageCb(socket);
+      socket.send(wsGenerateMessage('SUBSCRIBED', user));
+    }, 1000);
+  }
+
   on(type, cb) {
-    this.messageEventMap[type] = (payload, token) => {
-      const userData = jwt.verify(token, JWT_SECRET);
+    this.messageEventMap[type] = (payload) => {
+      const userData = {};
 
       if (userData) {
         cb(payload, userData);
 
         console.log(`recieved ${type} from userId ${userData.id} with payload ${JSON.stringify(payload).substr(0, 10000)}`);
+      } else {
+        console.log('WS auth failed!');
       }
     };
   }
 
-  assignEvents(socket) {
+  initMessageCb(socket) {
     socket.on('message', (message) => {
       const { type, payload, token } = wsParseMessage(message);
 

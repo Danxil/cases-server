@@ -1,6 +1,4 @@
-import jwt from 'jsonwebtoken';
 import { errorResponse } from '../helpers/responses';
-import { JWT_SECRET } from '../config';
 
 export default class SignUpHandler {
   constructor(db, userCtrl) {
@@ -15,9 +13,9 @@ export default class SignUpHandler {
 
       delete user.password;
 
-      const token = jwt.sign(user, JWT_SECRET);
+      // const token = jwt.sign(user, JWT_SECRET);
 
-      res.json({ token, user });
+      // res.json({ token, user });
     } catch (err) {
       console.error(err);
       res.status(500).send(errorResponse(err.message));
