@@ -1,6 +1,5 @@
 import WebSocket from 'ws';
 import passport from 'passport';
-import { wsGenerateMessage, wsParseMessage } from 'pty-common/ws-message';
 
 export default class WS {
   static getWsServerConfig({ server, sessionParser }) {
@@ -20,34 +19,57 @@ export default class WS {
     };
   }
 
-  constructor({ server, db, sessionParser }) {
+  constructor({ server, db, sessionParser, connectionCb }) {
     this.wsServer = new WebSocket.Server(WS.getWsServerConfig({ server, sessionParser }));
     this.db = db;
     this.messageEventMap = {};
     this.userIdSocketMap = {};
 
-    this.wsServer.on('connection', (socket, req) => {
-      this.handshakeCb({ socket, req });
-    });
+
+    this.wsServer.on('connection', this.connectionCb.bind(this, connectionCb));
   }
 
 
-  handshakeCb({ socket, req: { user } }) {
-    this.send(user.id, 'LOG_OUT');
-    setTimeout(() => {
-      this.userIdSocketMap[user.id] = socket;
-      this.initMessageCb(socket);
-      socket.send(wsGenerateMessage('SUBSCRIBED', user));
-    }, 1000);
+  connectionCb(connectionCb, socket, { user: { id: userId } }) {
+    try {
+      // eslint-disable-next-line no-param-reassign
+      socket.isAlive = true;
+      const oldSocket = this.userIdSocketMap[userId];
+      if (oldSocket) {
+        console.log('logout');
+        this.send(userId, 'LOG_OUT');
+        oldSocket.terminate();
+      }
+      setTimeout(() => {
+        this.userIdSocketMap[userId] = socket;
+        socket.on('message', this.messageCb.bind(this, socket));
+        socket.on('close', this.closeCb.bind(this, socket, userId));
+        this.send(userId, 'READY');
+        connectionCb.call(this, { userId });
+      }, 1000);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  messageCb(socket, message) {
+    const { type, payload } = JSON.parse(message);
+
+    if (this.messageEventMap[type]) {
+      this.messageEventMap[type](payload);
+    }
+  }
+
+  closeCb(socket, userId) {
+    console.log('deleted');
+    delete this.userIdSocketMap[userId];
   }
 
   on(type, cb) {
     this.messageEventMap[type] = (payload) => {
       const userData = {};
-
       if (userData) {
         cb(payload, userData);
-
         console.log(`recieved ${type} from userId ${userData.id} with payload ${JSON.stringify(payload).substr(0, 10000)}`);
       } else {
         console.log('WS auth failed!');
@@ -55,20 +77,12 @@ export default class WS {
     };
   }
 
-  initMessageCb(socket) {
-    socket.on('message', (message) => {
-      const { type, payload, token } = wsParseMessage(message);
-
-      if (this.messageEventMap[type]) {
-        this.messageEventMap[type](payload, token);
-      }
-    });
-  }
-
   send(userIds, type, payload = {}) {
     let userIdsArr;
 
-    if (!Array.isArray(userIds)) {
+    if (userIds === '*') {
+      userIdsArr = Object.keys(this.userIdSocketMap);
+    } else if (!Array.isArray(userIds)) {
       userIdsArr = [userIds];
     } else {
       userIdsArr = userIds;
@@ -76,16 +90,14 @@ export default class WS {
 
     userIdsArr.forEach((userId) => {
       const socket = this.userIdSocketMap[userId];
-
       if (socket) {
-        socket.send(wsGenerateMessage(type, payload), (err) => {
+        socket.send(JSON.stringify({ type, payload }), (err) => {
           if (err) {
             console.error(err);
           }
         });
       }
     });
-
-    console.log(`sent ${type} to userIds ${JSON.stringify(userIds)} with payload ${JSON.stringify(payload).substr(0, 10000)} `);
+    console.log(`sent ${type} to userIds ${JSON.stringify(userIdsArr)} with payload ${JSON.stringify(payload).substr(0, 10000)} `);
   }
 }

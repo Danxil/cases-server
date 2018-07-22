@@ -1,9 +1,9 @@
 import Sequelize from 'sequelize';
 
 export default (sequelize) => {
-  return sequelize.define('GameAction', {
+  const GameAction = sequelize.define('GameAction', {
     action: {
-      type: Sequelize.JSON,
+      type: Sequelize.JSONB,
       allowNull: false,
     },
   }, {
@@ -11,11 +11,12 @@ export default (sequelize) => {
       singular: 'gameAction',
       plural: 'gameActions',
     },
-    classMethods: {
-      associate(models) {
-        models.GameAction.belongsTo(models.GameUser, { foreignKey: 'gameUserId' });
-        models.GameAction.belongsTo(models.Game, { foreignKey: 'gameId' });
-      },
-    },
   });
+
+  GameAction.associate = (models) => {
+    models.GameAction.belongsTo(models.User, { foreignKey: 'userId' });
+    models.GameAction.belongsTo(models.Game, { foreignKey: 'gameId' });
+  };
+
+  return GameAction;
 };

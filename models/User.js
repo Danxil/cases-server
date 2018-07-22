@@ -1,7 +1,7 @@
 import Sequelize from 'sequelize';
 
 export default (sequelize) => {
-  return sequelize.define('User', {
+  const Model = sequelize.define('User', {
     twitterId: {
       type: Sequelize.STRING,
       defaultValue: null,
@@ -53,4 +53,10 @@ export default (sequelize) => {
       plural: 'users',
     },
   });
+
+  Model.prototype.verifyPassword = function (password) {
+    return password === this.password;
+  };
+
+  return Model;
 };

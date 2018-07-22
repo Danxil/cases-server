@@ -1,6 +1,6 @@
-import UserCtrl from '../controllers/user';
-import SignInHandler from '../handlers/sign-in';
-import SignUpHandler from '../handlers/sign-up';
+import signUpHandler from './handlers/signUp';
+import userHandler from './handlers/user';
+import logoutHandler from './handlers/logout';
 
 const authorization = (req, res, next) => {
   if (!req.isAuthenticated()) {
@@ -9,18 +9,12 @@ const authorization = (req, res, next) => {
   return next();
 };
 
-export default (app, db) => {
-  const userCtrl = new UserCtrl(db);
-
-  const signInHandler = new SignInHandler(db, userCtrl);
-  const signUpHandler = new SignUpHandler(db, userCtrl);
-
+export default ({ app, userCtrl }) => {
   app.get('/', (req, res) => {
     res.send('Home');
   });
 
-  app.post('/sign-in', signInHandler.run.bind(signInHandler));
-  app.post('/sign-up', signUpHandler.run.bind(signUpHandler));
-  app.get('/user', authorization, (req, res) => res.send(req.user.toJSON()));
-  app.get('/logout', authorization, (req, res) => res.send(req.logout()));
+  app.post('/sign-up', signUpHandler({ userCtrl }));
+  app.get('/user', authorization, userHandler());
+  app.get('/logout', authorization, logoutHandler());
 };
