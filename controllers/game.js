@@ -1,4 +1,4 @@
-import Sequelize from 'sequelize';
+// import Sequelize, { Op } from 'sequelize';
 import autoBind from 'auto-bind';
 import moment from 'moment';
 
@@ -12,27 +12,54 @@ export default class GameCtrl {
   }
 
   async checkNotExpiredGames() {
-    try {
-      const notExpiredGames = await this.getNotExpiredGames();
-      const aliveGames = await Promise.all(notExpiredGames.map((game) => {
-        return this.checkNotExpiredGame(game);
-      }));
-      for (
-        let i = aliveGames.length;
-        i < process.env.GAME_MIN_ALIVE_GAMES_AMOUNT;
-        i += 1
-      ) {
-        this.createGame();
-      }
-    } catch (e) {
-      console.log(e);
+    const notExpiredGames = await this.getNotExpiredGames();
+    const results = await Promise.all(notExpiredGames.map(async (game) => {
+      await this.checkConnectedGameUser(game);
+      return this.checkNotExpiredGame(game);
+    }));
+    const aliveGames = results.filter(result => result);
+    const gamesToCreateAmount = process.env.GAME_MIN_ALIVE_GAMES_AMOUNT - aliveGames.length;
+
+    if (gamesToCreateAmount > 0) {
+      const arr = Array.from(Array(gamesToCreateAmount).keys());
+      await Promise.all(arr.map(() => this.createGame()));
     }
   }
 
   async checkNotExpiredGame(game) {
-    const isGameExpired = await this.isGameExpired(game);
-    if (isGameExpired) return true;
-    await this.expireGame(game);
+    const lastGameUserAction = await this.getLastGameUserAction(game);
+    let from;
+    if (!lastGameUserAction) {
+      from = game.createdAt;
+    } else if (lastGameUserAction.type === GAME_USER_DISCONNECTED) {
+      from = lastGameUserAction.createdAt;
+    } else {
+      return true;
+    }
+    const isGameExpired = moment(new Date()).format() >= moment(from)
+    .add(process.env.GAME_GAME_TIMEOUT, 'ms')
+    .format();
+    if (isGameExpired) {
+      await this.expireGame(game);
+      return false;
+    }
+    return true;
+  }
+
+  async checkConnectedGameUser(game) {
+    const lastGameUserAction = await this.getLastGameUserAction(game);
+    if (
+      !lastGameUserAction ||
+      lastGameUserAction.type === GAME_USER_DISCONNECTED
+    ) return true;
+    const isValid = moment(lastGameUserAction.createdAt)
+    .add(process.env.GAME_USER_TIMEOUT).format() > moment(new Date()).format();
+    if (isValid) return true;
+    await this.createGameAction({
+      gameId: game.id,
+      userId: lastGameUserAction.userId,
+      type: GAME_USER_DISCONNECTED,
+    });
     return false;
   }
 
@@ -43,23 +70,20 @@ export default class GameCtrl {
     });
   }
 
-  async isGameExpired(game) {
-    const result = await game.getGameActions({
-      where: Sequelize.literal(`("GameAction"."action"->>'type') = '${GAME_USER_DISCONNECTED}'`),
+  async getLastGameUserAction({ id: gameId }) {
+    const result = await this.db.GameAction.findAll({
+      where: {
+        gameId,
+      },
       limit: 1,
       order: [['createdAt', 'DESC']],
     });
-    let from;
-    if (result.length) {
-      from = result[0].createdAt;
-    } else {
-      from = game.createdAt;
-    }
+    return result[0];
+  }
 
-    const expired = moment(from)
-    .add(process.env.GAME_GAME_TIMEOUT, 'ms')
-    .format() >= moment(new Date()).format();
-    return expired;
+  async isGameInProgress({ id }) {
+    const lastGameUserAction = await this.getLastGameUserAction({ id });
+    return lastGameUserAction && lastGameUserAction.type !== GAME_USER_DISCONNECTED;
   }
 
   async expireGame(game) {
@@ -69,38 +93,34 @@ export default class GameCtrl {
 
   async createGame() {
     const game = await this.db.Game.create();
-    this.ws.send('*', GAME_CREATED, game.toJSON());
+    this.ws.send('*', GAME_CREATED, { game: game.toJSON() });
   }
 
   async createGameAction({
     gameId,
     userId,
     type,
-    payload,
+    payload = {},
   }) {
     const game = await this.db.Game.findOne({
       where: { id: gameId },
     });
-
-    const checkResult = await this.checkNotExpiredGame(game);
-
-    if (!checkResult) {
+    const isGameNotExpired = await this.checkNotExpiredGame(game);
+    if (!isGameNotExpired) {
       throw new Error(`This game already expired. GameId: ${gameId} `);
     }
-
     const gameAction = await this.db.GameAction.create({
-      action: { type, payload },
+      type,
+      payload,
       gameId,
       userId,
     });
-
-    this.ws.send('*', type, gameAction.toJSON());
-
+    this.ws.send('*', type, { gameId, userId, ...payload });
     return gameAction;
   }
 
-  async sendInitData({ userId }) {
+  async sendInitData({ id }) {
     const aliveGames = await this.getNotExpiredGames();
-    this.ws.send(userId, 'INIT_DATA', { games: aliveGames.map(game => game.toJSON()) });
+    this.ws.send(id, 'INIT_DATA', { games: aliveGames.map(game => game.toJSON()) });
   }
 }

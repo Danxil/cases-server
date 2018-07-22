@@ -2,7 +2,11 @@ import Sequelize from 'sequelize';
 
 export default (sequelize) => {
   const GameAction = sequelize.define('GameAction', {
-    action: {
+    type: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
+    payload: {
       type: Sequelize.JSONB,
       allowNull: false,
     },

@@ -1,5 +1,5 @@
 {
-  "extends": "airbnb",
+  "extends": ["airbnb", "plugin:promise/recommended"],
   "env": {
     "jest": true,
     "node": true
@@ -9,5 +9,6 @@
     "class-methods-use-this": 0,
     "no-continue": 0,
     "import/prefer-default-export": 0
-  }
+  },
+  "plugins": ["promise"]
 }

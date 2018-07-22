@@ -38,7 +38,7 @@ configurePassport({ db, app });
 const server = app.listen(process.env.APP_REST_PORT);
 
 const gameCtrl = new GameCtrl({ db });
-const ws = new WS({ server, sessionParser, db, connectionCb: gameCtrl.sendInitData });
+const ws = new WS({ server, sessionParser, db }).on('connection', gameCtrl.sendInitData);
 gameCtrl.ws = ws;
 const userCtrl = new UserCtrl({ db, ws });
 
