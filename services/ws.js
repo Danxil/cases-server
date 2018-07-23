@@ -42,7 +42,8 @@ export default class WS {
         oldSocket.terminate();
       }
     } catch (error) {
-      return console.log(error);
+      console.log(error);
+      return;
     }
     setTimeout(async () => {
       try {

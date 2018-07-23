@@ -47,6 +47,10 @@ export default (sequelize) => {
       type: Sequelize.INTEGER,
       defaultValue: 0,
     },
+    balance: {
+      type: Sequelize.INTEGER,
+      defaultValue: 0,
+    },
   }, {
     name: {
       singular: 'user',

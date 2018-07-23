@@ -115,12 +115,23 @@ export default class GameCtrl {
       gameId,
       userId,
     });
-    this.ws.send('*', type, { gameId, userId, ...payload });
+    this.ws.send('*', type, { userId, gameId, ...payload });
     return gameAction;
   }
 
   async sendInitData({ id }) {
     const aliveGames = await this.getNotExpiredGames();
-    this.ws.send(id, 'INIT_DATA', { games: aliveGames.map(game => game.toJSON()) });
+    const gamesActions = [].concat
+    .apply([], aliveGames.map(({ gameActions }) => {
+      return [...gameActions.map(gameAction => gameAction.toJSON())];
+    }));
+    this.ws.send(id, 'INIT_DATA', {
+      games: aliveGames.map((game) => {
+        const jsonGame = game.toJSON();
+        delete jsonGame.gameActions;
+        return jsonGame;
+      }),
+      actions: gamesActions,
+    });
   }
 }
