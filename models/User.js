@@ -18,11 +18,10 @@ export default (sequelize) => {
       type: Sequelize.STRING,
       defaultValue: null,
     },
-    vkId: {
+    vkontakteId: {
       type: Sequelize.STRING,
       defaultValue: null,
     },
-    login: Sequelize.STRING,
     password: {
       type: Sequelize.STRING,
       defaultValue: null,
@@ -50,6 +49,15 @@ export default (sequelize) => {
     balance: {
       type: Sequelize.FLOAT,
       defaultValue: 50,
+    },
+    displayName: {
+      type: Sequelize.STRING,
+    },
+    email: {
+      type: Sequelize.STRING,
+    },
+    photo: {
+      type: Sequelize.STRING,
     },
   }, {
     name: {

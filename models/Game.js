@@ -44,6 +44,8 @@ export default (sequelize) => {
     models.Game.belongsTo(models.User, { foreignKey: 'creatorUserId' });
   };
 
+  Game.getRisk = ({ prize, chanceToWin }) => (prize * chanceToWin) / (100 - chanceToWin);
+
   Game.beforeValidate((game) => {
     /* eslint-disable no-param-reassign */
     if (!game.chanceToWin) {
@@ -55,8 +57,7 @@ export default (sequelize) => {
     if (!game.prize) {
       game.prize = _.random(GAME_MIN_PRIZE, GAME_MAX_PRIZE);
     }
-
-    game.risk = (game.prize * game.chanceToWin) / (100 - game.chanceToWin);
+    game.risk = Game.getRisk(game);
     /* eslint-disable no-param-reassign */
   });
 

@@ -1,17 +1,18 @@
 import {
-  CONNECT_TO_GAME,
+  NOTIFICATION_GAME_USER_CONNECT,
   GAME_USER_CONNECTED,
-  DISCONNECT_FROM_GAME,
+  NOTIFICATION_GAME_USER_DISCONNECT,
   GAME_USER_DISCONNECTED,
   GAME_SPIN,
   NOTIFICATION_GAME_SPIN,
+  NOTIFICATION_CREATE_GAME,
 } from '../actionsTypes';
 
 export default ({ ws, gameCtrl, userCtrl }) => {
   ws.on('message', async (user, { type, payload }) => {
     switch (type) {
-      case CONNECT_TO_GAME: {
-        const isGameInProgress = await gameCtrl.isGameInProgress({ id: payload.gameId });
+      case NOTIFICATION_GAME_USER_CONNECT: {
+        const isGameInProgress = await gameCtrl.isGameInProgress({ gameId: payload.gameId });
         if (isGameInProgress) break;
         await gameCtrl.createGameAction({
           type: GAME_USER_CONNECTED,
@@ -21,7 +22,7 @@ export default ({ ws, gameCtrl, userCtrl }) => {
         });
         break;
       }
-      case DISCONNECT_FROM_GAME: {
+      case NOTIFICATION_GAME_USER_DISCONNECT: {
         await gameCtrl.createGameAction({
           gameId: payload.gameId,
           userId: user.id,
@@ -31,7 +32,7 @@ export default ({ ws, gameCtrl, userCtrl }) => {
       }
       case NOTIFICATION_GAME_SPIN: {
         const { gameId } = payload;
-        const result = await gameCtrl.checkBeforeGameSpin({ user, gameId });
+        const result = await gameCtrl.checkBeforeNotificationGameSpin({ user, gameId });
         if (!result) return;
         await gameCtrl.createGameAction({
           gameId: payload.gameId,
@@ -51,6 +52,11 @@ export default ({ ws, gameCtrl, userCtrl }) => {
           payload,
         });
         ws.send(user.id, 'USER_UPDATED', updatedUser);
+        break;
+      }
+      case NOTIFICATION_CREATE_GAME: {
+        const { game } = payload;
+        await gameCtrl.createGame({ defaults: game, creatorUser: user });
         break;
       }
       default:

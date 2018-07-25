@@ -51,7 +51,7 @@ export default class WS {
         socket.on('message', this.messageCb.bind(this, user));
         socket.on('close', this.closeCb.bind(this, user));
         this.send(user.id, 'READY');
-        if (this.callbacks.onConnection) await this.callbacks.onConnection(user);
+        if (this.callbacks.onConnection) await this.callbacks.onConnection({ user });
       } catch (error) {
         console.log(error);
       }

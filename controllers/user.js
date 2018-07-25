@@ -4,14 +4,14 @@ export default class UserCtrl {
     this.ws = ws;
   }
 
-  async signUp({ login, password }) {
-    const user = await this.db.User.findOne({ where: { login } });
+  async signUp({ email, password }) {
+    const user = await this.db.User.findOne({ where: { email } });
 
     if (user) {
-      throw new Error(`User with login ${login} is already exist`);
+      throw new Error(`User with email ${email} is already exist`);
     }
 
-    return this.db.User.create({ login, password });
+    return this.db.User.create({ email, password });
   }
 
   async update({ id }, payload, { notify = true }) {

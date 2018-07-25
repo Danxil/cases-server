@@ -15,13 +15,39 @@ export default class GameCtrl {
     this.db = db;
     this.ws = ws;
   }
+  getNotExpiredGames() {
+    return this.db.Game.findAll({
+      where: { expired: false },
+      include: { model: this.db.GameAction },
+    });
+  }
+
+  async checkNotExpiredGame({ game }) {
+    await this.checkConnectedGameUser({ game });
+
+    const isGameExpired = await this.isGameExpired({ game });
+    if (isGameExpired) {
+      console.log(`Game expired. gamdId: ${game.id}`);
+      await this.expireGame({ game });
+      return false;
+    }
+    const isGameSpinInProgress = await this.isGameSpinInProgress({ game });
+    if (isGameSpinInProgress) return true;
+
+    const isMaxGameAttemptsReached = await this.isMaxGameAttemptsReached({ game });
+    if (isMaxGameAttemptsReached) {
+      console.log(`Max attempts reached. gamdId: ${game.id}`);
+      await this.expireGame({ game });
+      return false;
+    }
+    return true;
+  }
 
   async checkNotExpiredGames() {
     const notExpiredGames = await this.getNotExpiredGames();
-    const results = await Promise.all(notExpiredGames.map(async (game) => {
-      await this.checkConnectedGameUser(game);
-      return this.checkNotExpiredGame(game);
-    }));
+    const results = await Promise.all(
+      notExpiredGames.map(game => this.checkNotExpiredGame({ game })),
+    );
     const aliveGames = results.filter(result => result);
     const gamesToCreateAmount = process.env.GAME_MIN_ALIVE_GAMES_AMOUNT - aliveGames.length;
 
@@ -31,38 +57,31 @@ export default class GameCtrl {
     }
   }
 
-  async checkNotExpiredGame(game) {
-    const isGameExpired = await this.isGameExpired(game);
-    const isMaxGameAttemptsReached = await this.isMaxGameAttemptsReached({ game });
-    if (isGameExpired || isMaxGameAttemptsReached) {
-      await this.expireGame(game);
-      return false;
-    }
-    return true;
-  }
-
-  async checkConnectedGameUser(game) {
-    const { GAME_USER_TIMEOUT, GAME_GAME_SPIN_DELAY } = process.env;
-    const lastGameUserAction = await this.getLastGameUserAction(game);
+  async checkConnectedGameUser({ game }) {
+    const { GAME_USER_TIMEOUT } = process.env;
+    const lastGameUserAction = await this.getLastGameUserAction({ game });
     if (
       !lastGameUserAction ||
-      lastGameUserAction.type === GAME_USER_DISCONNECTED
+      lastGameUserAction.type === GAME_USER_DISCONNECTED ||
+      lastGameUserAction.type === NOTIFICATION_GAME_SPIN
     ) return true;
 
-    const add = lastGameUserAction.type !== NOTIFICATION_GAME_SPIN ?
-    GAME_USER_TIMEOUT :
-    GAME_USER_TIMEOUT + GAME_GAME_SPIN_DELAY;
-    const expireTime = moment(lastGameUserAction.createdAt).add(add).format();
+    const expireTime = moment(lastGameUserAction.createdAt).add(GAME_USER_TIMEOUT).format();
     const now = moment(new Date()).format();
-    const isValid = expireTime > now;
 
-    if (isValid) return true;
+    if (expireTime > now) return true;
+
     await this.createGameAction({
       gameId: game.id,
       userId: lastGameUserAction.userId,
       type: GAME_USER_DISCONNECTED,
     });
     return false;
+  }
+
+  async isGameSpinInProgress({ game }) {
+    const lastGameUserAction = await this.getLastGameUserAction({ game });
+    return lastGameUserAction && lastGameUserAction.type === NOTIFICATION_GAME_SPIN;
   }
 
   async isMaxGameAttemptsReached({ game, gameId }) {
@@ -78,8 +97,8 @@ export default class GameCtrl {
     return spinActions.length >= game.maxAttempts;
   }
 
-  async isGameExpired(game) {
-    const lastGameUserAction = await this.getLastGameUserAction(game);
+  async isGameExpired({ game }) {
+    const lastGameUserAction = await this.getLastGameUserAction({ game });
     let from;
     if (!lastGameUserAction) {
       from = game.createdAt;
@@ -93,58 +112,56 @@ export default class GameCtrl {
     return now >= expire;
   }
 
-
-  getNotExpiredGames() {
-    return this.db.Game.findAll({
-      where: { expired: false },
-      include: { model: this.db.GameAction },
-    });
-  }
-
-  async getLastGameUserAction({ id: gameId }) {
-    const result = await this.db.GameAction.findAll({
-      where: {
-        gameId,
-      },
-      limit: 1,
-      order: [['createdAt', 'DESC']],
-    });
-    return result[0];
-  }
-
-  async isGameInProgress({ id }) {
-    const lastGameUserAction = await this.getLastGameUserAction({ id });
+  async isGameInProgress({ gameId }) {
+    const lastGameUserAction = await this.getLastGameUserAction({ gameId });
     return lastGameUserAction && lastGameUserAction.type !== GAME_USER_DISCONNECTED;
   }
 
   async isBalanceEnough({ user, game }) {
-    return game.risk < user.balance;
+    return this.db.Game.getRisk(game) < user.balance;
   }
 
-  async checkBeforeGameSpin({ user, gameId }) {
+  async getLastGameUserAction({ gameId, game }) {
+    let result;
+    if (gameId) {
+      result = await this.db.GameAction.findAll({
+        where: {
+          gameId,
+        },
+        limit: 1,
+        order: [['createdAt', 'DESC']],
+      });
+    } else if (game) {
+      result = _.sortBy(game.gameActions, 'createdAt').reverse();
+    }
+    return result[0];
+  }
+
+  async checkBeforeNotificationGameSpin({ user, gameId }) {
     const game = await this.db.Game.find({
       where: { id: gameId },
       include: {
         model: this.db.GameAction,
-        where: { type: NOTIFICATION_GAME_SPIN },
-        required: false,
       },
     });
     const isBalanceEnough = await this.isBalanceEnough({ user, game });
+    if (!isBalanceEnough) {
+      console.log(`Low balance for spin gameId: ${gameId}, userId: ${user.id}`);
+      return false;
+    }
+
+    const isGameSpinInProgress = await this.isGameSpinInProgress({ game });
+    if (isGameSpinInProgress) {
+      console.log(`Game spin already in progress: ${gameId}, userId: ${user.id}`);
+      return false;
+    }
+
     const isMaxGameAttemptsReached = await this.isMaxGameAttemptsReached({ game });
-    if (!isBalanceEnough) console.log(`Low balance for spin gameId: ${gameId}, userId: ${user.id}`);
-    if (isMaxGameAttemptsReached) console.log(`Max attempts is reached: ${gameId}, userId: ${user.id}`);
-    return isBalanceEnough && !isMaxGameAttemptsReached;
-  }
-
-  async expireGame(game) {
-    await game.update({ expired: true });
-    this.ws.send('*', GAME_EXPIRED, { gameId: game.id });
-  }
-
-  async createGame() {
-    const game = await this.db.Game.create();
-    this.ws.send('*', GAME_CREATED, { game: game.toJSON() });
+    if (isMaxGameAttemptsReached) {
+      console.log(`Max attempts is reached: ${gameId}, userId: ${user.id}`);
+      return false;
+    }
+    return true;
   }
 
   async createGameAction({
@@ -154,25 +171,21 @@ export default class GameCtrl {
     payload = {},
     send = true,
   }) {
-    const game = await this.db.Game.findOne({
-      where: { id: gameId },
-    });
-    const isGameNotExpired = await this.checkNotExpiredGame(game);
-    if (!isGameNotExpired) {
-      console.log(`This game already expired. GameId: ${gameId} `);
-      return null;
-    }
+    const game = await this.db.Game.findOne({ where: { id: gameId } });
+    if (game.expired) return null;
+
     const gameAction = await this.db.GameAction.create({
       type,
       payload: { gameId, userId, ...payload },
       gameId,
       userId,
     });
-    if (send) this.ws.send('*', type, { userId, gameId, ...payload });
+    const user = await gameAction.getUser();
+    if (send) this.ws.send('*', type, { userId, gameId, user: user.toJSON(), ...payload });
     return gameAction;
   }
 
-  async sendInitData({ id }) {
+  async sendInitData({ user: { id } }) {
     const aliveGames = await this.getNotExpiredGames();
     const gamesActions = [].concat
     .apply([], aliveGames.map(({ gameActions }) => {
@@ -189,5 +202,22 @@ export default class GameCtrl {
       }),
       actions: gamesActions,
     });
+  }
+
+  async expireGame({ game }) {
+    await game.update({ expired: true });
+    this.ws.send('*', GAME_EXPIRED, { gameId: game.id });
+  }
+
+  async createGame({ defaults = {}, creatorUser } = {}) {
+    if (creatorUser) {
+      const isBalanceEnough = this.isBalanceEnough({ game: defaults, user: creatorUser });
+      if (!isBalanceEnough) return;
+      defaults.creatorUserId = creatorUser.id;
+    }
+    const game = await this.db.Game.create(defaults);
+    let jsonGame = game.toJSON();
+    if (creatorUser) jsonGame = { ...jsonGame, creatorUser };
+    this.ws.send('*', GAME_CREATED, { game: jsonGame });
   }
 }
