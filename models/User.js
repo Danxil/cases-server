@@ -48,8 +48,8 @@ export default (sequelize) => {
       defaultValue: 0,
     },
     balance: {
-      type: Sequelize.INTEGER,
-      defaultValue: 0,
+      type: Sequelize.FLOAT,
+      defaultValue: 50,
     },
   }, {
     name: {

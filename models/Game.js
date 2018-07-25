@@ -23,6 +23,10 @@ export default (sequelize) => {
       type: Sequelize.INTEGER,
       allowNull: false,
     },
+    risk: {
+      type: Sequelize.FLOAT,
+      allowNull: false,
+    },
     expired: {
       type: Sequelize.BOOLEAN,
       defaultValue: false,
@@ -51,6 +55,8 @@ export default (sequelize) => {
     if (!game.prize) {
       game.prize = _.random(GAME_MIN_PRIZE, GAME_MAX_PRIZE);
     }
+
+    game.risk = (game.prize * game.chanceToWin) / (100 - game.chanceToWin);
     /* eslint-disable no-param-reassign */
   });
 

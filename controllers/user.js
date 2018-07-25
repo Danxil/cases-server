@@ -1,6 +1,7 @@
 export default class UserCtrl {
-  constructor({ db }) {
+  constructor({ db, ws }) {
     this.db = db;
+    this.ws = ws;
   }
 
   async signUp({ login, password }) {
@@ -11,5 +12,12 @@ export default class UserCtrl {
     }
 
     return this.db.User.create({ login, password });
+  }
+
+  async update({ id }, payload, { notify = true }) {
+    const result = await this.db.User.update(payload, { returning: true, where: { id } });
+    const user = result[1][0];
+    if (notify) await this.ws.send(user.id, 'USER_UPDATED', user);
+    return user;
   }
 }

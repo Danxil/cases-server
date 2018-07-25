@@ -1,8 +1,13 @@
-// import Sequelize, { Op } from 'sequelize';
 import autoBind from 'auto-bind';
+import _ from 'lodash';
 import moment from 'moment';
 
-import { GAME_EXPIRED, GAME_USER_DISCONNECTED, GAME_CREATED } from '../actionsTypes';
+import {
+  GAME_EXPIRED,
+  GAME_USER_DISCONNECTED,
+  GAME_CREATED,
+  NOTIFICATION_GAME_SPIN,
+} from '../actionsTypes';
 
 export default class GameCtrl {
   constructor({ db, ws }) {
@@ -27,19 +32,9 @@ export default class GameCtrl {
   }
 
   async checkNotExpiredGame(game) {
-    const lastGameUserAction = await this.getLastGameUserAction(game);
-    let from;
-    if (!lastGameUserAction) {
-      from = game.createdAt;
-    } else if (lastGameUserAction.type === GAME_USER_DISCONNECTED) {
-      from = lastGameUserAction.createdAt;
-    } else {
-      return true;
-    }
-    const isGameExpired = moment(new Date()).format() >= moment(from)
-    .add(process.env.GAME_GAME_TIMEOUT, 'ms')
-    .format();
-    if (isGameExpired) {
+    const isGameExpired = await this.isGameExpired(game);
+    const isMaxGameAttemptsReached = await this.isMaxGameAttemptsReached({ game });
+    if (isGameExpired || isMaxGameAttemptsReached) {
       await this.expireGame(game);
       return false;
     }
@@ -47,13 +42,20 @@ export default class GameCtrl {
   }
 
   async checkConnectedGameUser(game) {
+    const { GAME_USER_TIMEOUT, GAME_GAME_SPIN_DELAY } = process.env;
     const lastGameUserAction = await this.getLastGameUserAction(game);
     if (
       !lastGameUserAction ||
       lastGameUserAction.type === GAME_USER_DISCONNECTED
     ) return true;
-    const isValid = moment(lastGameUserAction.createdAt)
-    .add(process.env.GAME_USER_TIMEOUT).format() > moment(new Date()).format();
+
+    const add = lastGameUserAction.type !== NOTIFICATION_GAME_SPIN ?
+    GAME_USER_TIMEOUT :
+    GAME_USER_TIMEOUT + GAME_GAME_SPIN_DELAY;
+    const expireTime = moment(lastGameUserAction.createdAt).add(add).format();
+    const now = moment(new Date()).format();
+    const isValid = expireTime > now;
+
     if (isValid) return true;
     await this.createGameAction({
       gameId: game.id,
@@ -62,6 +64,35 @@ export default class GameCtrl {
     });
     return false;
   }
+
+  async isMaxGameAttemptsReached({ game, gameId }) {
+    let targetGame;
+    if (!game) targetGame = await this.db.Game.find({ where: { id: gameId } });
+    else targetGame = game;
+    const spinActions = await this.db.GameAction.findAll({
+      where: {
+        type: NOTIFICATION_GAME_SPIN,
+        gameId: targetGame.id,
+      },
+    });
+    return spinActions.length >= game.maxAttempts;
+  }
+
+  async isGameExpired(game) {
+    const lastGameUserAction = await this.getLastGameUserAction(game);
+    let from;
+    if (!lastGameUserAction) {
+      from = game.createdAt;
+    } else if (lastGameUserAction.type === GAME_USER_DISCONNECTED) {
+      from = lastGameUserAction.createdAt;
+    } else {
+      return false;
+    }
+    const now = moment(new Date()).format();
+    const expire = moment(from).add(process.env.GAME_GAME_TIMEOUT, 'ms').format();
+    return now >= expire;
+  }
+
 
   getNotExpiredGames() {
     return this.db.Game.findAll({
@@ -86,9 +117,29 @@ export default class GameCtrl {
     return lastGameUserAction && lastGameUserAction.type !== GAME_USER_DISCONNECTED;
   }
 
+  async isBalanceEnough({ user, game }) {
+    return game.risk < user.balance;
+  }
+
+  async checkBeforeGameSpin({ user, gameId }) {
+    const game = await this.db.Game.find({
+      where: { id: gameId },
+      include: {
+        model: this.db.GameAction,
+        where: { type: NOTIFICATION_GAME_SPIN },
+        required: false,
+      },
+    });
+    const isBalanceEnough = await this.isBalanceEnough({ user, game });
+    const isMaxGameAttemptsReached = await this.isMaxGameAttemptsReached({ game });
+    if (!isBalanceEnough) console.log(`Low balance for spin gameId: ${gameId}, userId: ${user.id}`);
+    if (isMaxGameAttemptsReached) console.log(`Max attempts is reached: ${gameId}, userId: ${user.id}`);
+    return isBalanceEnough && !isMaxGameAttemptsReached;
+  }
+
   async expireGame(game) {
     await game.update({ expired: true });
-    this.ws.send('*', GAME_EXPIRED, { id: game.id });
+    this.ws.send('*', GAME_EXPIRED, { gameId: game.id });
   }
 
   async createGame() {
@@ -101,21 +152,23 @@ export default class GameCtrl {
     userId,
     type,
     payload = {},
+    send = true,
   }) {
     const game = await this.db.Game.findOne({
       where: { id: gameId },
     });
     const isGameNotExpired = await this.checkNotExpiredGame(game);
     if (!isGameNotExpired) {
-      throw new Error(`This game already expired. GameId: ${gameId} `);
+      console.log(`This game already expired. GameId: ${gameId} `);
+      return null;
     }
     const gameAction = await this.db.GameAction.create({
       type,
-      payload,
+      payload: { gameId, userId, ...payload },
       gameId,
       userId,
     });
-    this.ws.send('*', type, { userId, gameId, ...payload });
+    if (send) this.ws.send('*', type, { userId, gameId, ...payload });
     return gameAction;
   }
 
@@ -123,7 +176,10 @@ export default class GameCtrl {
     const aliveGames = await this.getNotExpiredGames();
     const gamesActions = [].concat
     .apply([], aliveGames.map(({ gameActions }) => {
-      return [...gameActions.map(gameAction => gameAction.toJSON())];
+      return [
+        ..._.sortBy(gameActions, 'createdAt')
+        .map(({ type, payload }) => ({ type, payload })),
+      ];
     }));
     this.ws.send(id, 'INIT_DATA', {
       games: aliveGames.map((game) => {
