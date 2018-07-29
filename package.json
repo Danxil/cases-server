@@ -8,16 +8,14 @@
   },
   "scripts": {
     "lint": "node_modules/.bin/eslint ./**/*.js ./*.js",
-    "start": "node_modules/.bin/nodemon index.js --exec ./node_modules/.bin/babel-node index.js",
+    "start": "./node_modules/.bin/babel-node index.js",
+    "start-dev": "node_modules/.bin/nodemon index.js --exec ./node_modules/.bin/babel-node index.js",
     "test-data": "node_modules/.bin/eslint ./**/*.js ./*.js && ./node_modules/babel-cli/bin/babel-node.js test-data.js",
     "test": "node_modules/.bin/eslint ./**/*.js ./*.js && node_modules/.bin/nodemon -w __tests__ -w ./ -e js,jsx --exec node_modules/.bin/jest"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-preset-env": "^1.7.0",
-    "babel-preset-stage-3": "^6.24.1",
     "eslint": "^3.19.0",
     "eslint-config-airbnb": "^14.0.0",
     "eslint-plugin-import": "^2.2.0",
@@ -28,6 +26,9 @@
     "nodemon": "^1.11.0"
   },
   "dependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-stage-3": "^6.24.1",
     "auto-bind": "^1.2.1",
     "body-parser": "^1.18.3",
     "chance": "^1.0.4",
