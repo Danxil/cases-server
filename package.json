@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "engines": {
+    "node": "10.6.0"
+  }
   "scripts": {
     "lint": "node_modules/.bin/eslint ./**/*.js ./*.js",
     "start": "node_modules/.bin/nodemon index.js --exec ./node_modules/.bin/babel-node index.js",
