@@ -1,5 +1,6 @@
 import Sequelize from 'sequelize';
 import _ from 'lodash';
+import { getRisk } from '../helpers/gameUtils';
 
 const {
   GAME_MIN_CHANCE_TO_WIN,
@@ -41,10 +42,8 @@ export default (sequelize) => {
 
   Game.associate = (models) => {
     models.Game.hasMany(models.GameAction, { foreignKey: 'gameId' });
-    models.Game.belongsTo(models.User, { foreignKey: 'creatorUserId' });
+    models.Game.belongsTo(models.User, { foreignKey: 'creatorUserId', as: 'creatorUser' });
   };
-
-  Game.getRisk = ({ prize, chanceToWin }) => (prize * chanceToWin) / (100 - chanceToWin);
 
   Game.beforeValidate((game) => {
     /* eslint-disable no-param-reassign */
@@ -57,7 +56,7 @@ export default (sequelize) => {
     if (!game.prize) {
       game.prize = _.random(GAME_MIN_PRIZE, GAME_MAX_PRIZE);
     }
-    game.risk = Game.getRisk(game);
+    game.risk = getRisk(game);
     /* eslint-disable no-param-reassign */
   });
 

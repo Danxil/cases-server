@@ -6,7 +6,7 @@ require('dotenv').config();
 
 /* eslint-disable import/first */
 import routes from './routes';
-import socketEvents from './socket-events';
+import socketEvents from './socketEvents';
 import configurePassport from './configs/configurePassport';
 import configureSessions from './configs/configureSessions';
 import configureSchedules from './configs/configureSchedules';
@@ -14,6 +14,7 @@ import configureDb from './services/db';
 import WS from './services/ws';
 import GameCtrl from './controllers/game';
 import UserCtrl from './controllers/user';
+import initData from './socketEvents/handlers/initData';
 /* eslint-enable import/first */
 
 const app = express();
@@ -39,12 +40,13 @@ const server = app.listen(process.env.APP_REST_PORT);
 
 const gameCtrl = new GameCtrl({ db });
 const userCtrl = new UserCtrl({ db });
-const ws = new WS({ server, sessionParser, db }).on('connection', gameCtrl.sendInitData);
-gameCtrl.ws = ws;
-userCtrl.ws = ws;
+const ws = new WS({ server, sessionParser, db }).on(
+  'connection',
+  ({ user, ws: wsService }) => initData({ user, ws: wsService, gameCtrl }),
+);
 
 
-configureSchedules({ gameCtrl });
+configureSchedules({ gameCtrl, userCtrl, ws });
 
 routes({ app, db, userCtrl });
 socketEvents({ ws, db, gameCtrl, userCtrl });
