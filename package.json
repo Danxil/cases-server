@@ -52,7 +52,6 @@
     "passport-twitter": "^1.0.4",
     "passport-vkontakte": "^0.3.2",
     "pg": "^6.1.2",
-    "pty-common": "git+ssh://git@github.com/Danxil/pty-common.git",
     "redis": "^2.8.0",
     "request": "^2.87.0",
     "request-promise": "^4.2.2",
