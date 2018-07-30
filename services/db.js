@@ -1,7 +1,7 @@
 import Sequelize from 'sequelize';
 import models from '../models';
 
-export default () => {
+export default async () => {
   const dbConnection = new Sequelize(
     process.env.DATABASE_URL,
     {
@@ -10,10 +10,20 @@ export default () => {
     },
   );
 
+  await dbConnection.query(
+    'CREATE TABLE IF NOT EXISTS "session" (' +
+      '"sid" varchar NOT NULL COLLATE "default",' +
+      '"sess" json NOT NULL,' +
+      '"expire" timestamp(6) NOT NULL' +
+    ')' +
+    'WITH (OIDS=FALSE);' +
+    'ALTER TABLE "session" DROP CONSTRAINT IF EXISTS "session_pkey";',
+    'ALTER TABLE "session" ADD CONSTRAINT "session_pkey" PRIMARY KEY ("sid") NOT DEFERRABLE INITIALLY IMMEDIATE;',
+  );
+
   const db = models(dbConnection);
 
-  return dbConnection.sync().then(() => {
-    console.log('DB sync done');
-    return db;
-  });
+  await dbConnection.sync();
+  console.log('DB sync succes');
+  return db;
 };
