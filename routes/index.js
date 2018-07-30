@@ -4,12 +4,9 @@ import logoutHandler from './handlers/logout';
 import statisticHandler from './handlers/statistic';
 
 const authorization = (req, res, next) => {
-  console.log(1);
   if (!req.isAuthenticated()) {
-    console.log(2);
     return res.send(401);
   }
-  console.log(4);
   return next();
 };
 

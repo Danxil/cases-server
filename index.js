@@ -44,7 +44,6 @@ configureDb().then((db) => {
     ({ user, ws: wsService }) => initData({ user, ws: wsService, gameCtrl }),
   );
 
-
   configureSchedules({ gameCtrl, userCtrl, ws });
 
   routes({ app, db, userCtrl });
