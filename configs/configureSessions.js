@@ -1,18 +1,25 @@
 import { Pool } from 'pg';
 import pgSs from 'connect-pg-simple';
 import session from 'express-session';
+import url from 'url';
+
+const params = url.parse(process.env.DATABASE_URL);
+const auth = params.auth.split(':');
+
+const config = {
+  user: auth[0],
+  password: auth[1],
+  host: params.hostname,
+  port: params.port,
+  database: params.pathname.split('/')[1],
+  ssl: true,
+};
 
 export default () => {
   const PgSs = pgSs(session);
 
   const sessionStore = new PgSs({
-    pool: new Pool({
-      // host: process.env.DB_HOST,
-      // database: process.env.DB_NAME,
-      // user: process.env.DB_USER,
-      // password: process.env.DB_PASSWORD,
-      // ssl: true,
-    }),
+    pool: new Pool(config),
   });
 
   return session({
