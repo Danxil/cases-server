@@ -5,7 +5,6 @@ import autoBind from 'auto-bind';
 export default class WS {
   static getWsServerConfig({ server, sessionParser }) {
     return {
-      port: 5001,
       perMessageDeflate: false,
       server,
       verifyClient: ({ req }, done) => {
