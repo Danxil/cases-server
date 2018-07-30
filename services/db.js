@@ -1,7 +1,7 @@
 import Sequelize from 'sequelize';
 import models from '../models';
 
-export default (cb) => {
+export default () => {
   const dbConnection = new Sequelize(
     process.env.DB_NAME,
     process.env.DB_USER,
