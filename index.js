@@ -1,5 +1,7 @@
 import express from 'express';
 import passport from 'passport';
+import cookieParser from 'cookie-parser';
+import bodyParser from 'body-parser';
 import cors from 'cors';
 
 require('dotenv').config();
@@ -19,20 +21,18 @@ import initData from './socketEvents/handlers/initData';
 
 const app = express();
 
-
-app.use(cors({
-  origin: [process.env.CLIENT_BASE_URL],
-  credentials: true,
-}));
-app.use(require('cookie-parser')());
-app.use(require('body-parser').json({ extended: true }));
-
-const sessionParser = configureSessions();
-app.use(sessionParser);
-app.use(passport.initialize());
-app.use(passport.session());
-
 configureDb().then((db) => {
+  app.use(cors({
+    origin: [process.env.CLIENT_BASE_URL],
+    credentials: true,
+  }));
+  app.use(cookieParser());
+  app.use(bodyParser.json({ extended: true }));
+
+  const sessionParser = configureSessions();
+  app.use(sessionParser);
+  app.use(passport.initialize());
+  app.use(passport.session());
   configurePassport({ db, app });
 
   const server = app.listen(process.env.PORT, () => console.log('REST started'));
@@ -51,5 +51,5 @@ configureDb().then((db) => {
   socketEvents({ ws, db, gameCtrl, userCtrl });
   return null;
 }).catch((e) => {
-  console.log(e);
+  console.log('App start failed!', e);
 });
