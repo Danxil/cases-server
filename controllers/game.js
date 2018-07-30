@@ -2,7 +2,7 @@ import autoBind from 'auto-bind';
 import _ from 'lodash';
 import moment from 'moment';
 import { getRisk } from '../helpers/gameUtils';
-import { GAME_USER_TIMEOUT, GAME_GAME_TIMEOUT, GAME_MIN_ALIVE_GAMES_AMOUNT } from '../gameConfig';
+import { GAME_USER_TIMEOUT, GAME_GAME_TIMEOUT, GAME_MIN_ALIVE_GAMES_AMOUNT, GAME_GAME_SPIN_DELAY } from '../gameConfig';
 
 export default class GameCtrl {
   constructor({ db }) {
@@ -20,11 +20,14 @@ export default class GameCtrl {
     const lastGameUserAction = await this.getLastGameUserAction({ game });
     if (
       !lastGameUserAction ||
-      lastGameUserAction.type === 'GAME_USER_DISCONNECTED' ||
-      lastGameUserAction.type === 'GAME_SPIN_START'
+      lastGameUserAction.type === 'GAME_USER_DISCONNECTED'
     ) return null;
 
-    const expireTime = moment(lastGameUserAction.createdAt).add(GAME_USER_TIMEOUT).format();
+    const add = lastGameUserAction.type === 'GAME_SPIN_START' ?
+    GAME_GAME_SPIN_DELAY * 2 :
+    GAME_USER_TIMEOUT;
+
+    const expireTime = moment(lastGameUserAction.createdAt).add(add).format();
     const now = moment(new Date()).format();
 
     if (expireTime > now) return null;
