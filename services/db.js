@@ -20,6 +20,5 @@ export default (cb) => {
   .then(() => {
     console.log('DB sync done');
     return cb(db);
-  })
-  .catch(() => console.log('DB sync failed'));
+  });
 };
