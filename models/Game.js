@@ -1,14 +1,13 @@
 import Sequelize from 'sequelize';
 import _ from 'lodash';
 import { getRisk } from '../helpers/gameUtils';
-
-const {
+import {
   GAME_MIN_CHANCE_TO_WIN,
   GAME_MAX_CHANCE_TO_WIN,
   GAME_MAX_ATTEMPTS,
   GAME_MIN_PRIZE,
   GAME_MAX_PRIZE,
-} = process.env;
+} from '../gameConfig';
 
 export default (sequelize) => {
   const Game = sequelize.define('Game', {

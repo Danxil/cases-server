@@ -2,6 +2,7 @@ import autoBind from 'auto-bind';
 import _ from 'lodash';
 import moment from 'moment';
 import { getRisk } from '../helpers/gameUtils';
+import { GAME_USER_TIMEOUT, GAME_GAME_TIMEOUT, GAME_MIN_ALIVE_GAMES_AMOUNT } from '../gameConfig';
 
 export default class GameCtrl {
   constructor({ db }) {
@@ -16,7 +17,6 @@ export default class GameCtrl {
   }
 
   async checkAndDisconnectConnectedGameUser({ game }) {
-    const { GAME_USER_TIMEOUT } = process.env;
     const lastGameUserAction = await this.getLastGameUserAction({ game });
     if (
       !lastGameUserAction ||
@@ -73,7 +73,7 @@ export default class GameCtrl {
     const gameUserDisconnectGameActions = results
     .filter(o => o.gameUserDisconnectGameAction)
     .map(o => o.gameUserDisconnectGameAction);
-    const gamesToCreateAmount = process.env.GAME_MIN_ALIVE_GAMES_AMOUNT -
+    const gamesToCreateAmount = GAME_MIN_ALIVE_GAMES_AMOUNT -
     (notExpiredGames.length -
     expiredGamesIds.length);
 
@@ -126,7 +126,7 @@ export default class GameCtrl {
       return false;
     }
     const now = moment(new Date()).format();
-    const expire = moment(from).add(process.env.GAME_GAME_TIMEOUT, 'ms').format();
+    const expire = moment(from).add(GAME_GAME_TIMEOUT, 'ms').format();
     return now >= expire;
   }
 

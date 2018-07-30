@@ -1,6 +1,12 @@
 import checkGames from '../socketEvents/handlers/checkGames';
 import addBot from '../socketEvents/handlers/addBot';
 import { updatePhotos, updateStatisticBots } from '../helpers/botsUtils';
+import {
+  GAME_CHECK_ALIVE_GAMES_INTERVAL,
+  GAME_ADD_BOT_INTERVAL,
+  GAME_UPDATE_BOTS_PHOTOS,
+  GAME_UPDATE_STATISTIC_BOTS,
+} from '../gameConfig';
 
 export default({ gameCtrl, userCtrl, ws }) => {
   setInterval(async () => {
@@ -9,7 +15,7 @@ export default({ gameCtrl, userCtrl, ws }) => {
     } catch (e) {
       console.log(e);
     }
-  }, process.env.GAME_CHECK_ALIVE_GAMES_INTERVAL);
+  }, GAME_CHECK_ALIVE_GAMES_INTERVAL);
 
   setInterval(async () => {
     try {
@@ -17,7 +23,7 @@ export default({ gameCtrl, userCtrl, ws }) => {
     } catch (e) {
       console.log(e);
     }
-  }, process.env.GAME_ADD_BOT_INTERVAL);
+  }, GAME_ADD_BOT_INTERVAL);
 
   setInterval(async () => {
     try {
@@ -25,7 +31,7 @@ export default({ gameCtrl, userCtrl, ws }) => {
     } catch (e) {
       console.log(e);
     }
-  }, process.env.GAME_UPDATE_BOTS_PHOTOS);
+  }, GAME_UPDATE_BOTS_PHOTOS);
 
   setInterval(async () => {
     try {
@@ -33,5 +39,5 @@ export default({ gameCtrl, userCtrl, ws }) => {
     } catch (e) {
       console.log(e);
     }
-  }, process.env.GAME_UPDATE_STATISTIC_BOTS);
+  }, GAME_UPDATE_STATISTIC_BOTS);
 };

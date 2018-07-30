@@ -2,6 +2,7 @@ import _ from 'lodash';
 import gameSpin from './gameSpin';
 import gameUserConnect from './gameUserConnect';
 import { getRandomPhoto, setPhotoInProgress, removePhotoFromProgress } from '../../helpers/botsUtils';
+import { GAME_MIN_ALIVE_GAMES_AMOUNT } from '../../gameConfig';
 
 export default async ({
   ws,
@@ -18,7 +19,7 @@ export default async ({
   if (
     !gamesNotInProgress.length ||
     notExpiredGames.length - gamesNotInProgress.length >= Math.round(
-      process.env.GAME_MIN_ALIVE_GAMES_AMOUNT / 3,
+      GAME_MIN_ALIVE_GAMES_AMOUNT / 3,
     )
   ) return;
   const user = await userCtrl.createBot();

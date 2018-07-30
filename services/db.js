@@ -2,7 +2,8 @@ import Sequelize from 'sequelize';
 import models from '../models';
 
 export default () => {
-  const dbConnection = new Sequelize(
+  const dbConnection = process.env.DB_URL ? new Sequelize(process.env.DB_URL) :
+  new Sequelize(
     process.env.DB_NAME,
     process.env.DB_USER,
     process.env.DB_PASSWORD,

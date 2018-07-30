@@ -1,3 +1,5 @@
+import { GAME_GAME_SPIN_DELAY } from '../../gameConfig';
+
 const gameSpinStart = async ({ game, user, result, gameCtrl, ws }) => {
   const gameActionStart = await gameCtrl.createGameAction({
     game,
@@ -56,6 +58,6 @@ export default async ({
   if (!checkResult) return;
   const updatedUser = await gameSpinStart({ game, user, result, gameCtrl, ws });
   if (!updatedUser) return;
-  await new Promise(resolve => setTimeout(resolve, process.env.GAME_GAME_SPIN_DELAY));
+  await new Promise(resolve => setTimeout(resolve, GAME_GAME_SPIN_DELAY));
   await gameSpinDone({ ws, game, user, payload, result, gameCtrl, updatedUser, botMode });
 };
