@@ -20,7 +20,6 @@ import initData from './socketEvents/handlers/initData';
 const app = express();
 const db = configureDb();
 
-console.log('Origin allow', process.env.CLIENT_BASE_URL);
 app.use(cors({
   origin: [process.env.CLIENT_BASE_URL],
   credentials: true,
