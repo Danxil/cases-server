@@ -16,9 +16,8 @@ export default (cb) => {
 
   const db = models(dbConnection);
 
-  return dbConnection.sync()
-  .then(() => {
+  return dbConnection.sync().then(() => {
     console.log('DB sync done');
-    return cb(db);
+    return db;
   });
 };

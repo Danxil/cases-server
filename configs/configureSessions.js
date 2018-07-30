@@ -16,6 +16,8 @@ export default () => {
   return session({
     secret: process.env.APP_SESSION_SECRET,
     store: sessionStore,
+    resave: true,
+    saveUninitialized: true,
     cookie: { secure: false },
   });
 };
