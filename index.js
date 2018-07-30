@@ -36,7 +36,7 @@ app.use(passport.session());
 
 configurePassport({ db, app });
 
-const server = app.listen(process.env.APP_REST_PORT);
+const server = app.listen(process.env.APP_REST_PORT, () => console.log('REST started'));
 
 const gameCtrl = new GameCtrl({ db });
 const userCtrl = new UserCtrl({ db });
