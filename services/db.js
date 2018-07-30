@@ -13,6 +13,7 @@ export default () => {
       logging: false,
       dialectOptions: {
         ssl: true,
+        connectionString: process.env.DATABASE_URL,
       },
     },
   );
