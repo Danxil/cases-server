@@ -18,7 +18,7 @@ import initData from './socketEvents/handlers/initData';
 /* eslint-enable import/first */
 
 const app = express();
-const db = configureDb();
+
 
 app.use(cors({
   origin: [process.env.CLIENT_BASE_URL],
@@ -32,20 +32,24 @@ app.use(sessionParser);
 app.use(passport.initialize());
 app.use(passport.session());
 
+configureDb().then((db) => {
+  configurePassport({ db, app });
 
-configurePassport({ db, app });
+  const server = app.listen(process.env.PORT, () => console.log('REST started'));
 
-const server = app.listen(process.env.PORT, () => console.log('REST started'));
-
-const gameCtrl = new GameCtrl({ db });
-const userCtrl = new UserCtrl({ db });
-const ws = new WS({ server, sessionParser, db }).on(
-  'connection',
-  ({ user, ws: wsService }) => initData({ user, ws: wsService, gameCtrl }),
-);
+  const gameCtrl = new GameCtrl({ db });
+  const userCtrl = new UserCtrl({ db });
+  const ws = new WS({ server, sessionParser, db }).on(
+    'connection',
+    ({ user, ws: wsService }) => initData({ user, ws: wsService, gameCtrl }),
+  );
 
 
-configureSchedules({ gameCtrl, userCtrl, ws });
+  configureSchedules({ gameCtrl, userCtrl, ws });
 
-routes({ app, db, userCtrl });
-socketEvents({ ws, db, gameCtrl, userCtrl });
+  routes({ app, db, userCtrl });
+  socketEvents({ ws, db, gameCtrl, userCtrl });
+  return null;
+}).catch((e) => {
+  console.log(e);
+});

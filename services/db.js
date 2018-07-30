@@ -1,7 +1,7 @@
 import Sequelize from 'sequelize';
 import models from '../models';
 
-export default () => {
+export default (cb) => {
   const dbConnection = new Sequelize(
     process.env.DB_NAME,
     process.env.DB_USER,
@@ -11,17 +11,15 @@ export default () => {
       host: process.env.DB_HOST,
       dialect: 'postgres',
       logging: false,
-      dialectOptions: {
-        ssl: true,
-        connectionString: process.env.DATABASE_URL,
-      },
     },
   );
 
   const db = models(dbConnection);
 
-  dbConnection.sync()
-  .then(() => console.log('DB sync done'))
+  return dbConnection.sync()
+  .then(() => {
+    console.log('DB sync done');
+    return cb(db);
+  })
   .catch(() => console.log('DB sync failed'));
-  return db;
 };
