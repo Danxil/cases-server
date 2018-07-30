@@ -18,7 +18,7 @@ export const updateStatisticBots = (amount) => {
   statisticBots = generateStatisticBots(amount);
 };
 
-export const getRandomPhoto = () => _.sample(
+export const getRandomPhoto = () => console.log(1111111, photos) || _.sample(
   photos.filter(o => photosInProgress.indexOf(o) === -1),
 );
 export const setPhotoInProgress = photo => photosInProgress.push(photo);
