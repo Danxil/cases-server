@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import gameSpin from './gameSpin';
 import gameUserConnect from './gameUserConnect';
-import { getRandomPhoto, setPhotoInProgress, removePhotoFromProgress } from '../../helpers/botsUtils';
+import { getRandomPlaygroundBot, setPlaygroundBotInProgress, removePlaygroundBotFromInProgress } from '../../helpers/botsUtils';
 import { GAME_MIN_ALIVE_GAMES_AMOUNT } from '../../gameConfig';
 
 export default async ({
@@ -15,7 +15,9 @@ export default async ({
     if (isGameInProgress) return null;
     return game;
   }));
-  const gamesNotInProgress = map.filter(o => o && !o.creatorUserId);
+
+  const gamesNotInProgress = map.filter(o => o);
+
   if (
     !gamesNotInProgress.length ||
     notExpiredGames.length - gamesNotInProgress.length >= Math.round(
@@ -23,11 +25,12 @@ export default async ({
     )
   ) return;
   const user = await userCtrl.createBot();
+  const bot = getRandomPlaygroundBot();
+  setPlaygroundBotInProgress(bot);
+  user.displayName = bot.displayName;
+  user.photo = bot.photo;
 
-  const { id: gameId } = _.sample(gamesNotInProgress);
-  const photo = getRandomPhoto();
-  setPhotoInProgress(photo);
-  user.photo = photo;
+  const { id: gameId, chanceToWin, prize, risk } = _.sample(gamesNotInProgress);
 
   await gameUserConnect({
     ws,
@@ -35,13 +38,13 @@ export default async ({
     user,
     payload: { gameId },
   });
-
+  const result = Math.random() >= chanceToWin / 100;
   await gameSpin({
     ws,
     gameCtrl,
-    payload: { gameId, result: _.random(-0.5, 0.5) },
+    payload: { gameId, result: result ? prize : -risk },
     user,
     botMode: true,
   });
-  removePhotoFromProgress(photo);
+  removePlaygroundBotFromInProgress(bot);
 };

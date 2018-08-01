@@ -37,8 +37,9 @@ configureDb().then((db) => {
 
   const server = app.listen(process.env.PORT, () => console.log('REST started'));
 
-  const gameCtrl = new GameCtrl({ db });
   const userCtrl = new UserCtrl({ db });
+  const gameCtrl = new GameCtrl({ db, userCtrl });
+
   const ws = new WS({ server, sessionParser, db }).on(
     'connection',
     ({ user, ws: wsService }) => initData({ user, ws: wsService, gameCtrl }),

@@ -2,12 +2,16 @@ import autoBind from 'auto-bind';
 import _ from 'lodash';
 import moment from 'moment';
 import { getRisk } from '../helpers/gameUtils';
+import {
+  getRandomPlaygroundBot,
+} from '../helpers/botsUtils';
 import { GAME_USER_TIMEOUT, GAME_GAME_TIMEOUT, GAME_MIN_ALIVE_GAMES_AMOUNT, GAME_GAME_SPIN_DELAY } from '../gameConfig';
 
 export default class GameCtrl {
-  constructor({ db }) {
+  constructor({ db, userCtrl }) {
     autoBind(this);
     this.db = db;
+    this.userCtrl = userCtrl;
   }
   getNotExpiredGames() {
     return this.db.Game.findAll({
@@ -256,7 +260,16 @@ export default class GameCtrl {
   }
 
   async createGame({ defaults = {} } = {}) {
+    let user;
+    if (!defaults.creatorUserId) {
+      user = await this.userCtrl.createBot();
+      const bot = getRandomPlaygroundBot();
+      user.photo = bot.photo;
+      user.displayName = bot.displayName;
+      defaults.creatorUserId = user.id;
+    }
     const game = await this.db.Game.create(defaults);
+    game.creatorUser = user;
     console.log(`Game created. gameId: ${game.id}`);
     return game;
   }

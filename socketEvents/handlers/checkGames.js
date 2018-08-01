@@ -16,7 +16,7 @@ export default async ({
     ws.send('*', 'PLAYGROUND_UPDATED', {
       expiredGamesIds,
       gameUserDisconnectGameActions,
-      createdGames,
+      createdGames: createdGames.map(o => ({ ...o.toJSON(), creatorUser: o.creatorUser.toJSON() })),
       notifyUsersCreatorsIdsAboutGameExpired,
     });
   }

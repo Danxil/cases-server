@@ -1,6 +1,6 @@
 import checkGames from '../socketEvents/handlers/checkGames';
 import addBot from '../socketEvents/handlers/addBot';
-import { updatePhotos, updateStatisticBots } from '../helpers/botsUtils';
+import { updatePlaygroundBots, updateStatisticBots } from '../helpers/botsUtils';
 import {
   GAME_CHECK_ALIVE_GAMES_INTERVAL,
   GAME_ADD_BOT_INTERVAL,
@@ -27,7 +27,7 @@ export default({ gameCtrl, userCtrl, ws }) => {
 
   setInterval(async () => {
     try {
-      updatePhotos(10);
+      updatePlaygroundBots(10);
     } catch (e) {
       console.log(e);
     }
