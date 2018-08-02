@@ -27,7 +27,7 @@ export default({ gameCtrl, userCtrl, ws }) => {
 
   setInterval(async () => {
     try {
-      updatePlaygroundBots(10);
+      await updatePlaygroundBots(10);
     } catch (e) {
       console.log(e);
     }
@@ -35,7 +35,7 @@ export default({ gameCtrl, userCtrl, ws }) => {
 
   setInterval(async () => {
     try {
-      updateStatisticBots(50);
+      await updateStatisticBots(50);
     } catch (e) {
       console.log(e);
     }

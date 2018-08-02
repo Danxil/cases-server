@@ -1,4 +1,4 @@
-export const GAME_MIN_ALIVE_GAMES_AMOUNT = 22;
+export const GAME_MIN_ALIVE_GAMES_AMOUNT = 42;
 export const GAME_GAME_TIMEOUT = 30000;
 export const GAME_USER_TIMEOUT = 15000;
 export const GAME_GAME_SPIN_DELAY = 12000;

@@ -265,8 +265,10 @@ export default class GameCtrl {
     if (!defaults.creatorUserId) {
       user = await this.userCtrl.createBot();
       const bot = getRandomPlaygroundBot();
-      user.photo = bot.photo;
-      user.displayName = bot.displayName;
+      if (bot) {
+        user.photo = bot.photo;
+        user.displayName = bot.displayName;
+      }
       defaults.creatorUserId = user.id;
     }
     const game = await this.db.Game.create(defaults);
