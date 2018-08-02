@@ -248,7 +248,8 @@ export default class GameCtrl {
 
   async expireGame({ game }) {
     console.log(`Game expired. gameId: ${game.id}`);
-    await game.update({ expired: true });
+    await Promise.all(game.gameActions.map(o => o.destroy({ force: true })));
+    await game.destroy({ force: true });
     const attemptsAmount = await this.getAttemptsAmount({ gameId: game.id });
     const attemptsLeft = game.maxAttempts - attemptsAmount;
     if (attemptsLeft <= 0 || !game.creatorUser) return null;
