@@ -4,7 +4,6 @@ export default async ({
 }) => {
   const {
     expiredGamesIds,
-    gameUserDisconnectGameActions,
     createdGames,
     notifyUsersCreatorsIdsAboutGameExpired,
     usersToUpdate,
@@ -12,10 +11,10 @@ export default async ({
   if (usersToUpdate.length) {
     usersToUpdate.forEach(o => ws.send(o.id, 'USER_UPDATED', o));
   }
-  if (expiredGamesIds.length || gameUserDisconnectGameActions.length || createdGames.length) {
+  if (expiredGamesIds.length || createdGames.length) {
     ws.send('*', 'PLAYGROUND_UPDATED', {
       expiredGamesIds,
-      gameUserDisconnectGameActions,
+      gameUserDisconnectGameActions: [],
       createdGames: createdGames.map(o => ({ ...o.toJSON(), creatorUser: o.creatorUser.toJSON() })),
       notifyUsersCreatorsIdsAboutGameExpired,
     });

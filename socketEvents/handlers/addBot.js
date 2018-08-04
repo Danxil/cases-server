@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import gameSpin from './gameSpin';
 import gameUserConnect from './gameUserConnect';
-import { getRandomPlaygroundBot, setPlaygroundBotInProgress, removePlaygroundBotFromInProgress } from '../../helpers/botsUtils';
+import { getRandomPlaygroundBot } from '../../helpers/fakesUtils';
 import { GAME_MIN_ALIVE_GAMES_AMOUNT } from '../../gameConfig';
 
 export default async ({
@@ -26,7 +26,9 @@ export default async ({
   ) return;
   const user = await userCtrl.createBot();
   const bot = getRandomPlaygroundBot();
-  setPlaygroundBotInProgress(bot);
+
+  if (!bot) return;
+
   user.displayName = bot.displayName;
   user.photo = bot.photo;
 
@@ -46,5 +48,4 @@ export default async ({
     user,
     botMode: true,
   });
-  removePlaygroundBotFromInProgress(bot);
 };

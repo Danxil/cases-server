@@ -4,7 +4,7 @@ import moment from 'moment';
 import { getRisk } from '../helpers/gameUtils';
 import {
   getRandomPlaygroundBot,
-} from '../helpers/botsUtils';
+} from '../helpers/fakesUtils';
 import { GAME_USER_TIMEOUT, GAME_GAME_TIMEOUT, GAME_MIN_ALIVE_GAMES_AMOUNT, GAME_GAME_SPIN_DELAY } from '../gameConfig';
 
 export default class GameCtrl {
@@ -45,30 +45,40 @@ export default class GameCtrl {
     return gameAction;
   }
 
-  async checkAndEpireNotExpiredGame({ game }) {
-    const gameUserDisconnectGameAction = await this.checkAndDisconnectConnectedGameUser({ game });
+  async checkAndExpireNotExpiredGame({ game }) {
     const isGameTimeoutReached = await this.isGameTimeoutReached({ game });
     if (isGameTimeoutReached) {
       console.log(`Game timeout reached. gamedId: ${game.id}`);
       const userToUpdate = await this.expireGame({ game });
-      return { expiredGame: game, gameUserDisconnectGameAction, userToUpdate };
+      return { expiredGame: game, userToUpdate };
     }
     const isGameSpinInProgress = await this.isGameSpinInProgress({ game });
-    if (isGameSpinInProgress) return { gameUserDisconnectGameAction };
+    if (isGameSpinInProgress) return {};
 
     const isMaxGameAttemptsReached = await this.isMaxGameAttemptsReached({ game });
     if (isMaxGameAttemptsReached) {
       console.log(`Max attempts reached. gamedId: ${game.id}`);
       const userToUpdate = await this.expireGame({ game });
-      return { expiredGame: game, gameUserDisconnectGameAction, userToUpdate };
+      return { expiredGame: game, userToUpdate };
     }
-    return { gameUserDisconnectGameAction };
+    return {};
+  }
+
+  async checkAndDisconnectConnectedGameUsers() {
+    const notExpiredGames = await this.getNotExpiredGames();
+    const result = await Promise.all(
+      notExpiredGames.map(game => this.checkAndDisconnectConnectedGameUser({ game })),
+    );
+    const gameUserDisconnectGameActions = result.filter(o => o);
+    return {
+      gameUserDisconnectGameActions,
+    };
   }
 
   async checkAndExpireNotExpiredGames() {
     const notExpiredGames = await this.getNotExpiredGames();
     const results = await Promise.all(
-      notExpiredGames.map(game => this.checkAndEpireNotExpiredGame({ game })),
+      notExpiredGames.map(game => this.checkAndExpireNotExpiredGame({ game })),
     );
 
     const expiredGames = results.filter(o => o.expiredGame);
@@ -77,9 +87,6 @@ export default class GameCtrl {
     .filter(o => o);
     const expiredGamesIds = expiredGames.map(o => o.expiredGame.id);
 
-    const gameUserDisconnectGameActions = results
-    .filter(o => o.gameUserDisconnectGameAction)
-    .map(o => o.gameUserDisconnectGameAction);
     const gamesToCreateAmount = GAME_MIN_ALIVE_GAMES_AMOUNT -
     (notExpiredGames.length -
     expiredGamesIds.length);
@@ -93,7 +100,6 @@ export default class GameCtrl {
     return {
       expiredGamesIds,
       notifyUsersCreatorsIdsAboutGameExpired,
-      gameUserDisconnectGameActions,
       createdGames,
       usersToUpdate,
     };

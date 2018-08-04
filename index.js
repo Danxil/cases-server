@@ -3,6 +3,7 @@ import passport from 'passport';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import cors from 'cors';
+import PaymentsCtrl from './controllers/payments';
 
 require('dotenv').config();
 
@@ -21,7 +22,7 @@ import initData from './socketEvents/handlers/initData';
 
 const app = express();
 
-configureDb().then((db) => {
+configureDb().then(async (db) => {
   app.use(cors({
     origin: [process.env.CLIENT_BASE_URL],
     credentials: true,
@@ -39,15 +40,16 @@ configureDb().then((db) => {
 
   const userCtrl = new UserCtrl({ db });
   const gameCtrl = new GameCtrl({ db, userCtrl });
+  const paymentsCtrl = new PaymentsCtrl({ db });
 
   const ws = new WS({ server, sessionParser, db }).on(
     'connection',
     ({ user, ws: wsService }) => initData({ user, ws: wsService, gameCtrl }),
   );
 
-  configureSchedules({ gameCtrl, userCtrl, ws });
+  await configureSchedules({ gameCtrl, userCtrl, ws });
 
-  routes({ app, db, userCtrl });
+  routes({ app, db, userCtrl, paymentsCtrl });
   socketEvents({ ws, db, gameCtrl, userCtrl });
   return null;
 }).catch((e) => {
