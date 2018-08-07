@@ -49,7 +49,7 @@ export default (sequelize) => {
     },
     balance: {
       type: Sequelize.FLOAT,
-      defaultValue: 1000,
+      defaultValue: START_USER_BALANCE,
       allowNull: false,
     },
     paid: {

@@ -52,8 +52,7 @@ export default (sequelize) => {
   Game.beforeValidate((game) => {
     /* eslint-disable no-param-reassign */
     if (!game.chanceToWin) {
-      // game.chanceToWin = _.random(GAME_MIN_CHANCE_TO_WIN, GAME_MAX_CHANCE_TO_WIN);
-      game.chanceToWin = 80;
+      game.chanceToWin = _.random(GAME_MIN_CHANCE_TO_WIN, GAME_MAX_CHANCE_TO_WIN);
     }
     if (!game.maxAttempts) {
       game.maxAttempts = _.random(1, GAME_MAX_ATTEMPTS);
