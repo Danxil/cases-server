@@ -19,9 +19,9 @@ export default () => {
   const sessionStore = new PgSs({
     pool: new Pool(config),
   });
-
   return session({
     secret: process.env.APP_SESSION_SECRET,
+    domain: process.env.CLIENT_BASE_URL.split('//')[1],
     store: sessionStore,
     resave: true,
     saveUninitialized: true,
