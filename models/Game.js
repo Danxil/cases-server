@@ -1,5 +1,6 @@
 import Sequelize from 'sequelize';
 import _ from 'lodash';
+import AES from 'crypto-js/aes';
 import { getRisk } from '../helpers/gameUtils';
 import {
   GAME_MIN_CHANCE_TO_WIN,
@@ -32,6 +33,10 @@ export default (sequelize) => {
       defaultValue: false,
       allowNull: false,
     },
+    schema: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
   }, {
     name: {
       singular: 'game',
@@ -47,7 +52,8 @@ export default (sequelize) => {
   Game.beforeValidate((game) => {
     /* eslint-disable no-param-reassign */
     if (!game.chanceToWin) {
-      game.chanceToWin = _.random(GAME_MIN_CHANCE_TO_WIN, GAME_MAX_CHANCE_TO_WIN);
+      // game.chanceToWin = _.random(GAME_MIN_CHANCE_TO_WIN, GAME_MAX_CHANCE_TO_WIN);
+      game.chanceToWin = 80;
     }
     if (!game.maxAttempts) {
       game.maxAttempts = _.random(1, GAME_MAX_ATTEMPTS);
@@ -56,6 +62,13 @@ export default (sequelize) => {
       game.prize = _.random(GAME_MIN_PRIZE, GAME_MAX_PRIZE);
     }
     game.risk = getRisk(game);
+    const coeficient = (100 - game.chanceToWin) / 100;
+    const lengthLooseItems = Math.ceil(game.maxAttempts * coeficient);
+    const schema = _.shuffle([].concat(
+      new Array(lengthLooseItems).fill(0),
+      new Array(game.maxAttempts - lengthLooseItems).fill(1),
+    )).join('');
+    game.schema = AES.encrypt(schema, 'dAfg$1397642gsge_39').toString();
     /* eslint-disable no-param-reassign */
   });
 

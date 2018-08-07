@@ -26,16 +26,17 @@
     "nodemon": "^1.11.0"
   },
   "dependencies": {
+    "auto-bind": "^1.2.1",
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.7.0",
     "babel-preset-stage-3": "^6.24.1",
-    "auto-bind": "^1.2.1",
     "body-parser": "^1.18.3",
     "chance": "^1.0.4",
     "connect-pg-simple": "^5.0.0",
     "connect-redis": "^3.3.3",
     "cookie-parser": "^1.4.3",
     "cors": "^2.8.4",
+    "crypto-js": "^3.1.9-1",
     "dotenv": "^6.0.0",
     "express": "^4.14.1",
     "express-session": "^1.15.6",

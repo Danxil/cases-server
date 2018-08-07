@@ -46,12 +46,12 @@ export default class GameCtrl {
   }
 
   async checkAndExpireNotExpiredGame({ game }) {
-    const isGameTimeoutReached = await this.isGameTimeoutReached({ game });
-    if (isGameTimeoutReached) {
-      console.log(`Game timeout reached. gamedId: ${game.id}`);
-      const userToUpdate = await this.expireGame({ game });
-      return { expiredGame: game, userToUpdate };
-    }
+    // const isGameTimeoutReached = await this.isGameTimeoutReached({ game });
+    // if (isGameTimeoutReached) {
+    //   console.log(`Game timeout reached. gamedId: ${game.id}`);
+    //   const userToUpdate = await this.expireGame({ game });
+    //   return { expiredGame: game, userToUpdate };
+    // }
     const isGameSpinInProgress = await this.isGameSpinInProgress({ game });
     if (isGameSpinInProgress) return {};
 
