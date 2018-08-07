@@ -4,8 +4,12 @@ export default class PaymentsCtrl {
     this.ws = ws;
   }
 
-  async getHistory() {
-    const history = await this.db.Payment.findAll({ include: this.db.User });
+  async getHistory({ filter }) {
+    const history = await this.db.Payment.findAll({ where: { ...filter }, include: this.db.User });
     return history;
+  }
+  async createPayment({ amount, userId }) {
+    const payment = await this.db.Payment.create({ amount, userId });
+    return payment;
   }
 }

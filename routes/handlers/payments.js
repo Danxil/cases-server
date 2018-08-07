@@ -1,16 +1,15 @@
 import _ from 'lodash';
-import { getRandomPayment } from '../../helpers/fakesUtils';
+import { getPayments } from '../../helpers/fakesUtils';
 import { MIN_PAYMENTS_TO_SHOW } from '../../gameConfig';
 
 export default ({ paymentsCtrl }) => async (req, res) => {
-  const history = await paymentsCtrl.getHistory();
-  const fakePaymentsLength = history.length < MIN_PAYMENTS_TO_SHOW ?
+  const filter = JSON.parse(req.query.filter);
+  const history = await paymentsCtrl.getHistory({ filter });
+  const fakePaymentsLength = history.length < MIN_PAYMENTS_TO_SHOW && !filter.userId ?
     MIN_PAYMENTS_TO_SHOW - history.length :
     0;
-  const fakePayments = new Array(fakePaymentsLength)
-  .fill()
-  .map(() => getRandomPayment());
-  console.log(11, fakePaymentsLength);
-  const result = _.sortBy(history.concat(fakePayments), 'createdAt');
-  res.send(result);
+  const fakePayments = getPayments();
+  const fakePaymentsToAdd = fakePayments.slice(0, fakePaymentsLength);
+  const result = _.sortBy(history.concat(fakePaymentsToAdd), 'createdAt');
+  return res.send(result);
 };

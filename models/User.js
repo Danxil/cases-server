@@ -1,4 +1,5 @@
 import Sequelize from 'sequelize';
+import { START_USER_BALANCE } from '../gameConfig';
 
 export default (sequelize) => {
   const User = sequelize.define('User', {
@@ -48,7 +49,13 @@ export default (sequelize) => {
     },
     balance: {
       type: Sequelize.FLOAT,
-      defaultValue: 50,
+      defaultValue: START_USER_BALANCE,
+      allowNull: false,
+    },
+    paid: {
+      type: Sequelize.FLOAT,
+      defaultValue: 0,
+      allowNull: false,
     },
     displayName: {
       type: Sequelize.STRING,

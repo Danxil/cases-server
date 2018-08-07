@@ -49,7 +49,7 @@ configureDb().then(async (db) => {
 
   await configureSchedules({ gameCtrl, userCtrl, ws });
 
-  routes({ app, db, userCtrl, paymentsCtrl });
+  routes({ app, ws, db, userCtrl, paymentsCtrl });
   socketEvents({ ws, db, gameCtrl, userCtrl });
   return null;
 }).catch((e) => {

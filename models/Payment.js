@@ -2,6 +2,11 @@ import Sequelize from 'sequelize';
 
 export default (sequelize) => {
   const Payment = sequelize.define('Payment', {
+    status: {
+      type: Sequelize.STRING,
+      allowNull: false,
+      defaultValue: 'inProgress',
+    },
     amount: {
       type: Sequelize.FLOAT,
       allowNull: false,
