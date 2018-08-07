@@ -26,6 +26,7 @@ export default ({ app, userCtrl, paymentsCtrl, ws }) => {
 
   app.use(express.static(path.join(__dirname, '../', 'client')));
   app.get('/*', (req, res) => {
+    console.log(22222)
     res.sendFile(path.join(__dirname, '../', 'client', 'index.html'));
   });
 };

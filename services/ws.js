@@ -36,7 +36,7 @@ export default class WS {
     try {
       const oldSocket = this.userIdSocketMap[user.id];
       if (oldSocket) {
-        console.log('logout');
+        // console.log('logout');
         this.send(user.id, 'LOG_OUT');
         oldSocket.terminate();
       }
@@ -47,8 +47,8 @@ export default class WS {
     setTimeout(async () => {
       try {
         this.userIdSocketMap[user.id] = socket;
-        socket.on('message', this.messageCb.bind(this, user));
-        socket.on('close', this.closeCb.bind(this, user));
+        // socket.on('message', this.messageCb.bind(this, user));
+        // socket.on('close', this.closeCb.bind(this, user));
         this.send(user.id, 'READY');
         if (this.callbacks.onConnection) await this.callbacks.onConnection({ user, ws: this });
       } catch (error) {
@@ -61,7 +61,7 @@ export default class WS {
     try {
       const { type, payload } = JSON.parse(message);
       await user.reload();
-      console.log(`recieved ${type} from userId ${user.id}`);
+      // console.log(`recieved ${type} from userId ${user.id}`);
       if (this.callbacks.onMessage) await this.callbacks.onMessage(user, { type, payload });
     } catch (e) {
       console.log(e);
@@ -70,7 +70,7 @@ export default class WS {
 
   async closeCb(user) {
     try {
-      console.log('deleted');
+      // console.log('deleted');
       delete this.userIdSocketMap[user.id];
       if (this.callbacks.onClose) await this.callbacks.onClose(user);
     } catch (e) {
@@ -104,6 +104,6 @@ export default class WS {
         });
       }
     });
-    console.log(`sent ${type} to userIds ${JSON.stringify(userIdsArr)}`);
+    // console.log(`sent ${type} to userIds ${JSON.stringify(userIdsArr)}`);
   }
 }

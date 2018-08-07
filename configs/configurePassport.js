@@ -113,10 +113,12 @@ const configureStrategy = ({ app, db }) => ({ service, Strategy }) => {
     },
     verify({ service, db }),
   ));
-
   app.get(
     `${process.env.API_PREFIX}/auth/${service}`,
-    passport.authenticate(service, getAuthOptions({ service })),
+    (req, res) => {
+      console.log(1111);
+      passport.authenticate(service, getAuthOptions({ service }))(req, res);
+    },
   );
   app.get(
     `${process.env.API_PREFIX}/auth/${service}/callback`,

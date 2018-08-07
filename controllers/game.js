@@ -35,7 +35,7 @@ export default class GameCtrl {
     const now = moment(new Date()).format();
 
     if (expireTime > now) return null;
-    console.log(`Game user disconnected. gamedId: ${game.id}, userId: ${lastGameUserAction.userId}`);
+    // console.log(`Game user disconnected. gamedId: ${game.id}, userId: ${lastGameUserAction.userId}`);
     const gameAction = await this.createGameAction({
       gameId: game.id,
       userId: lastGameUserAction.userId,
@@ -57,7 +57,7 @@ export default class GameCtrl {
 
     const isMaxGameAttemptsReached = await this.isMaxGameAttemptsReached({ game });
     if (isMaxGameAttemptsReached) {
-      console.log(`Max attempts reached. gamedId: ${game.id}`);
+      // console.log(`Max attempts reached. gamedId: ${game.id}`);
       const userToUpdate = await this.expireGame({ game });
       return { expiredGame: game, userToUpdate };
     }
@@ -182,19 +182,19 @@ export default class GameCtrl {
     }
     const isBalanceEnough = await this.isBalanceEnough({ user, game });
     if (!isBalanceEnough) {
-      console.log(`Game spin impossible. Low balance. gameId: ${game.id}, userId: ${user.id}`);
+      // console.log(`Game spin impossible. Low balance. gameId: ${game.id}, userId: ${user.id}`);
       return false;
     }
 
     const isGameSpinInProgress = await this.isGameSpinInProgress({ game });
     if (isGameSpinInProgress) {
-      console.log(`Game spin impossible. Game spin already in progress. gameId ${game.id}, userId: ${user.id}`);
+      // console.log(`Game spin impossible. Game spin already in progress. gameId ${game.id}, userId: ${user.id}`);
       return false;
     }
 
     const isMaxGameAttemptsReached = await this.isMaxGameAttemptsReached({ game });
     if (isMaxGameAttemptsReached) {
-      console.log(`Game spin impossible. Max attempts is reached. gameId: ${game.id}, userId: ${user.id}`);
+      // console.log(`Game spin impossible. Max attempts is reached. gameId: ${game.id}, userId: ${user.id}`);
       return false;
     }
     return true;
@@ -212,7 +212,7 @@ export default class GameCtrl {
     else game = await this.db.Game.findOne({ where: { id: gameId } });
 
     if (game.expired) {
-      console.log(`GameAction not created. Game already expired. gameId: ${game.id}, userId: ${userId}, gameActionType: ${type}`);
+      // console.log(`GameAction not created. Game already expired. gameId: ${game.id}, userId: ${userId}, gameActionType: ${type}`);
       return null;
     }
 
@@ -222,7 +222,7 @@ export default class GameCtrl {
       gameId: game.id,
       userId,
     });
-    console.log(`GameAction created. gameId: ${game.id}, userId: ${userId}, gameActionType: ${type}`);
+    // console.log(`GameAction created. gameId: ${game.id}, userId: ${userId}, gameActionType: ${type}`);
     return gameAction;
   }
 
@@ -253,7 +253,7 @@ export default class GameCtrl {
   }
 
   async expireGame({ game }) {
-    console.log(`Game expired. gameId: ${game.id}`);
+    // console.log(`Game expired. gameId: ${game.id}`);
     await Promise.all(game.gameActions.map(o => o.destroy({ force: true })));
     await game.destroy({ force: true });
     const attemptsAmount = await this.getAttemptsAmount({ gameId: game.id });
@@ -279,7 +279,7 @@ export default class GameCtrl {
     }
     const game = await this.db.Game.create(defaults);
     game.creatorUser = user;
-    console.log(`Game created. gameId: ${game.id}`);
+    // console.log(`Game created. gameId: ${game.id}`);
     return game;
   }
 
