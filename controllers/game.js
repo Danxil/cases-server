@@ -95,7 +95,7 @@ export default class GameCtrl {
     .filter(o => o.userToUpdate)
     .map(o => o.userToUpdate);
 
-    const arr = Array.from(Array(gamesToCreateAmount >= 0 ? gamesToCreateAmount : 0).keys());
+    const arr = new Array(gamesToCreateAmount >= 0 ? gamesToCreateAmount : 0).fill();
     const createdGames = await Promise.all(arr.map(() => this.createGame()));
     return {
       expiredGamesIds,
