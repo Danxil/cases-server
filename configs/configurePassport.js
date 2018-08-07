@@ -108,18 +108,18 @@ const configureStrategy = ({ app, db }) => ({ service, Strategy }) => {
     new Strategy({
       [appIdField]: process.env[`APP_${serviceUpperCase}_APP_ID`],
       [appSecretField]: process.env[`APP_${serviceUpperCase}_APP_SECRET`],
-      callbackURL: `/auth/${service}/callback`,
+      callbackURL: `${process.env.API_PREFIX}/auth/${service}/callback`,
       profileFields: getProfileFields({ service }),
     },
     verify({ service, db }),
   ));
 
   app.get(
-    `/auth/${service}`,
+    `${process.env.API_PREFIX}/auth/${service}`,
     passport.authenticate(service, getAuthOptions({ service })),
   );
   app.get(
-    `/auth/${service}/callback`,
+    `${process.env.API_PREFIX}/auth/${service}/callback`,
     passport.authenticate(
       service,
       {
@@ -156,7 +156,7 @@ export default ({ db, app }) => {
     localStrategyVerify({ db }),
   ));
   app.post(
-    '/auth/local',
+    `${process.env.API_PREFIX}/auth/local`,
     passport.authenticate('local'),
     (req, res) => {
       console.log('Authentication succes', req.body);
