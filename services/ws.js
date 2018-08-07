@@ -61,7 +61,7 @@ export default class WS {
     try {
       const { type, payload } = JSON.parse(message);
       await user.reload();
-      console.log(`recieved ${type} from userId ${user.id} with payload ${JSON.stringify(payload).substr(0, 10000)}`);
+      console.log(`recieved ${type} from userId ${user.id}`);
       if (this.callbacks.onMessage) await this.callbacks.onMessage(user, { type, payload });
     } catch (e) {
       console.log(e);
@@ -104,6 +104,6 @@ export default class WS {
         });
       }
     });
-    console.log(`sent ${type} to userIds ${JSON.stringify(userIdsArr)} with payload ${JSON.stringify(payload).substr(0, 10000)} `);
+    console.log(`sent ${type} to userIds ${JSON.stringify(userIdsArr)}`);
   }
 }
