@@ -211,7 +211,7 @@ export default class GameCtrl {
     if (gameToUse) game = gameToUse;
     else game = await this.db.Game.findOne({ where: { id: gameId } });
 
-    if (game.expired) {
+    if (!game || game.expired) {
       // console.log(`GameAction not created. Game already expired. gameId: ${game.id}, userId: ${userId}, gameActionType: ${type}`);
       return null;
     }
