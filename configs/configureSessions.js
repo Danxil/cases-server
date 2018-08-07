@@ -19,11 +19,12 @@ export default () => {
   const sessionStore = new PgSs({
     pool: new Pool(config),
   });
+  const domain = process.env.CLIENT_BASE_URL.split('//')[1];
   return session({
     secret: process.env.APP_SESSION_SECRET,
     store: sessionStore,
     resave: true,
     saveUninitialized: true,
-    cookie: { secure: false },
+    cookie: { secure: false, domain },
   });
 };
