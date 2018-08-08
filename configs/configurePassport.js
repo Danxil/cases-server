@@ -116,6 +116,7 @@ const configureStrategy = ({ app, db }) => ({ service, Strategy }) => {
   app.get(
     `${process.env.API_PREFIX}/auth/${service}`,
     (req, res) => {
+      console.log(222);
       passport.authenticate(service, getAuthOptions({ service }))(req, res);
     },
   );
