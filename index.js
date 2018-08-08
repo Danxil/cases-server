@@ -35,7 +35,7 @@ configureDb().then(async (db) => {
   app.use(sessionParser);
   app.use(passport.initialize());
   app.use(passport.session());
-  app.use(express.static(path.join(__dirname, 'client')));
+  app.use(express.static(path.join(__dirname, 'client'), { index: false, extensions: false, redirect: false }));
   configurePassport({ db, app });
 
   const server = app.listen(process.env.PORT, () => console.log('REST started'));
