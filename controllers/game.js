@@ -253,8 +253,10 @@ export default class GameCtrl {
   }
 
   async expireGame({ game }) {
-    // console.log(`Game expired. gameId: ${game.id}`);
-    await Promise.all(game.gameActions.map(o => o.destroy({ force: true })));
+    console.log(`Game expired. gameId: ${game.id}`);
+    await Promise.all(game.gameActions.map((o) => {
+      return this.db.GameAction.destroy({ where: { id: o.id }, force: true });
+    }));
     await game.destroy({ force: true });
     const attemptsAmount = await this.getAttemptsAmount({ gameId: game.id });
     const attemptsLeft = game.maxAttempts - attemptsAmount;
