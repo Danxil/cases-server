@@ -36,7 +36,7 @@ export default class WS {
     try {
       const oldSocket = this.userIdSocketMap[user.id];
       if (oldSocket) {
-        // console.log('logout');
+        console.log('logout');
         this.send(user.id, 'LOG_OUT');
         oldSocket.terminate();
       }
@@ -47,8 +47,8 @@ export default class WS {
     setTimeout(async () => {
       try {
         this.userIdSocketMap[user.id] = socket;
-        // socket.on('message', this.messageCb.bind(this, user));
-        // socket.on('close', this.closeCb.bind(this, user));
+        socket.on('message', this.messageCb.bind(this, user));
+        socket.on('close', this.closeCb.bind(this, user));
         this.send(user.id, 'READY');
         if (this.callbacks.onConnection) await this.callbacks.onConnection({ user, ws: this });
       } catch (error) {
@@ -79,6 +79,7 @@ export default class WS {
   }
 
   on(action, cb) {
+    console.log()
     this.callbacks[`on${action.charAt(0).toUpperCase() + action.slice(1)}`] = cb;
     return this;
   }
@@ -96,6 +97,11 @@ export default class WS {
 
     userIdsArr.forEach((userId) => {
       const socket = this.userIdSocketMap[userId];
+      if (!socket) return;
+      if (socket.readyState !== WebSocket.OPEN) {
+        delete this.userIdSocketMap[userId];
+        return;
+      }
       if (socket) {
         socket.send(JSON.stringify({ type, payload }), (err) => {
           if (err) {
