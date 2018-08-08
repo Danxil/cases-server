@@ -3,6 +3,7 @@ import passport from 'passport';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import cors from 'cors';
+import path from 'path';
 import PaymentsCtrl from './controllers/payments';
 
 require('dotenv').config();
@@ -18,7 +19,6 @@ import WS from './services/ws';
 import GameCtrl from './controllers/game';
 import UserCtrl from './controllers/user';
 import initData from './socketEvents/handlers/initData';
-import path from "path";
 /* eslint-enable import/first */
 
 const app = express();

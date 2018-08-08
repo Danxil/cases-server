@@ -7,8 +7,6 @@ import statisticHandler from './handlers/statistic';
 import paymentsHandler from './handlers/payments';
 import createPaymentHandler from './handlers/createPayment';
 
-const { API_PREFIX } = process.env;
-
 const authorization = (req, res, next) => {
   if (!req.isAuthenticated()) {
     return res.send(401);
