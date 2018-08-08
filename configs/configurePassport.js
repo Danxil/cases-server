@@ -115,22 +115,17 @@ const configureStrategy = ({ app, db }) => ({ service, Strategy }) => {
   ));
   app.get(
     `${process.env.API_PREFIX}/auth/${service}`,
-    (req, res) => {
-      console.log(222);
-      passport.authenticate(service, getAuthOptions({ service }))(req, res);
-    },
+    passport.authenticate(service, getAuthOptions({ service })),
   );
   app.get(
     `${process.env.API_PREFIX}/auth/${service}/callback`,
-    (req, res) => {
-      passport.authenticate(
-        service,
-        {
-          failureRedirect: `${process.env.CLIENT_BASE_URL}/login`,
-          successRedirect: `${process.env.CLIENT_BASE_URL}/`,
-        },
-      )(req, res);
-    },
+    passport.authenticate(
+      service,
+      {
+        failureRedirect: `${process.env.CLIENT_BASE_URL}/login`,
+        successRedirect: `${process.env.CLIENT_BASE_URL}/`,
+      },
+    ),
   );
 };
 
