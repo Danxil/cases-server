@@ -24,7 +24,7 @@ export default ({ app, userCtrl, paymentsCtrl, ws }) => {
   app.get(`${process.env.API_PREFIX}/payments`, paymentsHandler({ paymentsCtrl }));
   app.post(`${process.env.API_PREFIX}/user/:userId/payments`, createPaymentHandler({ paymentsCtrl, ws }));
 
-  app.use(express.static(path.join(__dirname, '../', 'client')));
+  app.use('/client', express.static(path.join(__dirname, '../', 'client')));
   app.get('/*', (req, res) => {
     console.log(22222)
     res.sendFile(path.join(__dirname, '../', 'client', 'index.html'));
