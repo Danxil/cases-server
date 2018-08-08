@@ -23,7 +23,7 @@ export default ({ app, userCtrl, paymentsCtrl, ws }) => {
   app.get(`${process.env.API_PREFIX}/statistic`, statisticHandler());
   app.get(`${process.env.API_PREFIX}/payments`, paymentsHandler({ paymentsCtrl }));
   app.post(`${process.env.API_PREFIX}/user/:userId/payments`, createPaymentHandler({ paymentsCtrl, ws }));
-  app.get('/*', (req, res) => {
+  app.get('/', (req, res) => {
     console.log(22222)
     res.sendFile(path.join(__dirname, '../', 'client', 'index.html'));
   });
