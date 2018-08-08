@@ -18,6 +18,7 @@ import WS from './services/ws';
 import GameCtrl from './controllers/game';
 import UserCtrl from './controllers/user';
 import initData from './socketEvents/handlers/initData';
+import path from "path";
 /* eslint-enable import/first */
 
 const app = express();
@@ -34,6 +35,7 @@ configureDb().then(async (db) => {
   app.use(sessionParser);
   app.use(passport.initialize());
   app.use(passport.session());
+  app.use(express.static(path.join(__dirname, 'client')));
   configurePassport({ db, app });
 
   const server = app.listen(process.env.PORT, () => console.log('REST started'));
