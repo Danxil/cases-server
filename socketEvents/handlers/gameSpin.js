@@ -2,8 +2,6 @@ import { GAME_GAME_SPIN_DELAY } from '../../gameConfig';
 
 const gameSpinStart = async ({ game, gameCtrl, user, result, ws, db }) => {
   const gameJson = gameCtrl.convertGameToJson(game);
-  console.log(1, game.won);
-  console.log(1, game.lost);
   const updateObj = { spinInProgress: true };
   if (result > 0) updateObj.won = game.won + 1;
   else updateObj.lost = game.lost + 1;
