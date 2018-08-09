@@ -6,12 +6,12 @@ import {
   GAME_CHECK_ALIVE_GAMES_INTERVAL,
   GAME_ADD_BOT_INTERVAL,
   GAME_UPDATE_PLAYGROUND_BOTS_INTERVAL,
-  UPDATE_PLAYGROUND_BOTS_INTERVAL,
+  UPDATE_STATISTIC_BOTS_INTERVAL,
   GAME_CHECK_CONNECTED_USERS_INTERVAL,
   UPDATE_PAYMENTS_FAKES_INTERVAL,
 } from '../gameConfig';
 
-export default async ({ gameCtrl, userCtrl, ws }) => {
+export default async ({ gameCtrl, userCtrl, ws, db }) => {
   await checkGames({ gameCtrl, ws });
   setInterval(async () => {
     try {
@@ -23,6 +23,7 @@ export default async ({ gameCtrl, userCtrl, ws }) => {
 
   await checkConnectedUsers({ gameCtrl, ws });
   setInterval(async () => {
+    console.log('memory', process.memoryUsage().rss);
     try {
       await checkConnectedUsers({ gameCtrl, ws });
     } catch (e) {
@@ -32,7 +33,7 @@ export default async ({ gameCtrl, userCtrl, ws }) => {
 
   setInterval(async () => {
     try {
-      await addBot({ gameCtrl, userCtrl, ws });
+      await addBot({ gameCtrl, userCtrl, ws, db });
     } catch (e) {
       console.log(e);
     }
@@ -52,7 +53,7 @@ export default async ({ gameCtrl, userCtrl, ws }) => {
     } catch (e) {
       console.log(e);
     }
-  }, UPDATE_PLAYGROUND_BOTS_INTERVAL);
+  }, UPDATE_STATISTIC_BOTS_INTERVAL);
 
   setInterval(async () => {
     try {

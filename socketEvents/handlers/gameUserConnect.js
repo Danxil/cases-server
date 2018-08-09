@@ -5,15 +5,12 @@ export default async ({
   payload,
 }) => {
   const { gameId } = payload;
-  const isGameInProgress = await gameCtrl.isGameInProgress({ gameId });
-  if (isGameInProgress) return;
-  const gameAction = await gameCtrl.createGameAction({
-    type: 'GAME_USER_CONNECTED',
-    payload: { user },
-    gameId,
-    userId: user.id,
+  const game = await gameCtrl.findGame({ gameId });
+  if (!game || game.connectedUserId) return;
+  const updatedGame = await game.update({
+    connectedUserId: user.id,
+    lastTouchAt: new Date(),
   });
-  if (gameAction) {
-    ws.send('*', gameAction.type, { userId: user.id, gameId, user, ...payload });
-  }
+  updatedGame.connectedUser = user;
+  ws.send('*', 'GAME_UPDATED', { game: gameCtrl.convertGameToJson(updatedGame), reason: 'GAME_USER_CONNECTED' });
 };

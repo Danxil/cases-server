@@ -1,3 +1,8 @@
+import dotenv from 'dotenv';
+
+dotenv.config()
+
+/* eslint-disable import/first */
 import express from 'express';
 import passport from 'passport';
 import cookieParser from 'cookie-parser';
@@ -5,10 +10,6 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import path from 'path';
 import PaymentsCtrl from './controllers/payments';
-
-require('dotenv').config();
-
-/* eslint-disable import/first */
 import routes from './routes';
 import socketEvents from './socketEvents';
 import configurePassport from './configs/configurePassport';
@@ -22,7 +23,6 @@ import initData from './socketEvents/handlers/initData';
 /* eslint-enable import/first */
 
 const app = express();
-
 configureDb().then(async (db) => {
   app.use(cors({
     origin: [process.env.CLIENT_BASE_URL],
@@ -49,7 +49,7 @@ configureDb().then(async (db) => {
     ({ user, ws: wsService }) => initData({ user, ws: wsService, gameCtrl }),
   );
 
-  await configureSchedules({ gameCtrl, userCtrl, ws });
+  await configureSchedules({ gameCtrl, userCtrl, ws, db });
 
   routes({ app, ws, db, userCtrl, paymentsCtrl });
   socketEvents({ ws, db, gameCtrl, userCtrl });

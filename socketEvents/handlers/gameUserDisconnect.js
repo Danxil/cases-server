@@ -1,17 +1,14 @@
 export default async ({
   ws,
-  gameCtrl,
   payload,
-  user,
+  gameCtrl,
 }) => {
   const { gameId } = payload;
-  const gameAction = await gameCtrl.createGameAction({
-    gameId,
-    userId: user.id,
-    user,
-    type: 'GAME_USER_DISCONNECTED',
+  const game = await gameCtrl.findGame({ gameId });
+  const updatedGame = await game.update({
+    connectedUserId: null,
+    lastTouchAt: null,
   });
-  if (gameAction) {
-    ws.send('*', gameAction.type, { userId: user.id, gameId, user, ...payload });
-  }
+  delete updatedGame.connectedUser;
+  ws.send('*', 'GAME_UPDATED', { game: gameCtrl.convertGameToJson(updatedGame), reason: 'GAME_USER_DISCONNECTED' });
 };

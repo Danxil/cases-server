@@ -22,7 +22,7 @@ export default async () => {
   );
 
   const db = models(dbConnection);
-
+  db.sequelize = dbConnection;
   await dbConnection.sync();
   console.log('DB sync succes');
   return db;

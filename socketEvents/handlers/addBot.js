@@ -6,13 +6,13 @@ import { GAME_MIN_ALIVE_GAMES_AMOUNT } from '../../gameConfig';
 
 export default async ({
   ws,
+  db,
   gameCtrl,
   userCtrl,
 }) => {
   const notExpiredGames = await gameCtrl.getNotExpiredGames();
   const map = await Promise.all(notExpiredGames.map(async (game) => {
-    const isGameInProgress = await gameCtrl.isGameInProgress({ game });
-    if (isGameInProgress) return null;
+    if (game.connectedUserId) return null;
     return game;
   }));
 
@@ -36,6 +36,7 @@ export default async ({
 
   await gameUserConnect({
     ws,
+    db,
     gameCtrl,
     user,
     payload: { gameId },
@@ -43,6 +44,7 @@ export default async ({
   const result = Math.random() >= chanceToWin / 100;
   await gameSpin({
     ws,
+    db,
     gameCtrl,
     payload: { gameId, result: result ? prize : -risk },
     user,

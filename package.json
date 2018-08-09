@@ -9,7 +9,7 @@
   "scripts": {
     "lint": "node_modules/.bin/eslint ./**/*.js ./*.js",
     "start": "./node_modules/.bin/babel-node index.js",
-    "start-dev": "node_modules/.bin/nodemon index.js --exec ./node_modules/.bin/babel-node index.js",
+    "start-dev": "node_modules/.bin/nodemon index.js --inspect --exec ./node_modules/.bin/babel-node index.js",
     "test-data": "node_modules/.bin/eslint ./**/*.js ./*.js && ./node_modules/babel-cli/bin/babel-node.js test-data.js",
     "test": "node_modules/.bin/eslint ./**/*.js ./*.js && node_modules/.bin/nodemon -w __tests__ -w ./ -e js,jsx --exec node_modules/.bin/jest"
   },
@@ -37,6 +37,7 @@
     "cookie-parser": "^1.4.3",
     "cors": "^2.8.4",
     "crypto-js": "^3.1.9-1",
+    "debug": "^3.1.0",
     "dotenv": "^6.0.0",
     "express": "^4.14.1",
     "express-session": "^1.15.6",

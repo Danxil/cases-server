@@ -3,12 +3,12 @@ export default async ({
   gameCtrl,
 }) => {
   const {
-    gameUserDisconnectGameActions,
+    gameUsersDisconnected,
   } = await gameCtrl.checkAndDisconnectConnectedGameUsers();
-  if (gameUserDisconnectGameActions.length) {
+  if (gameUsersDisconnected.length) {
     ws.send('*', 'PLAYGROUND_UPDATED', {
       expiredGamesIds: [],
-      gameUserDisconnectGameActions,
+      gameUsersDisconnected,
       createdGames: [],
       notifyUsersCreatorsIdsAboutGameExpired: [],
     });

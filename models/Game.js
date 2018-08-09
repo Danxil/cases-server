@@ -24,11 +24,21 @@ export default (sequelize) => {
       type: Sequelize.INTEGER,
       allowNull: false,
     },
+    won: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+    },
+    lost: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+    },
     risk: {
       type: Sequelize.FLOAT,
       allowNull: false,
     },
-    expired: {
+    spinInProgress: {
       type: Sequelize.BOOLEAN,
       defaultValue: false,
       allowNull: false,
@@ -37,6 +47,9 @@ export default (sequelize) => {
       type: Sequelize.STRING,
       allowNull: false,
     },
+    lastTouchAt: {
+      type: Sequelize.DATE,
+    },
   }, {
     name: {
       singular: 'game',
@@ -44,9 +57,20 @@ export default (sequelize) => {
     },
   });
 
+  Game.prototype.isMaxAttemptsReached = function () {
+    return this.won + this.lost >= this.maxAttempts;
+  };
+
+  Game.prototype.getAttemptsAmount = function () {
+    return this.won + this.lost;
+  };
+  Game.prototype.getLeftAttemptsAmount = function () {
+    return this.maxAttempts - (this.won + this.lost);
+  };
+
   Game.associate = (models) => {
-    models.Game.hasMany(models.GameAction, { foreignKey: 'gameId' });
     models.Game.belongsTo(models.User, { foreignKey: 'creatorUserId', as: 'creatorUser' });
+    models.Game.belongsTo(models.User, { foreignKey: 'connectedUserId', as: 'connectedUser' });
   };
 
   Game.beforeValidate((game) => {
