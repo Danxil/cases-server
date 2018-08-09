@@ -1,6 +1,9 @@
 import { GAME_GAME_SPIN_DELAY } from '../../gameConfig';
 
 const gameSpinStart = async ({ game, gameCtrl, user, result, ws, db }) => {
+  const gameJson = gameCtrl.convertGameToJson(game);
+  console.log(1, game.won);
+  console.log(1, game.lost);
   const updateObj = { spinInProgress: true };
   if (result > 0) updateObj.won = game.won + 1;
   else updateObj.lost = game.lost + 1;
@@ -13,7 +16,8 @@ const gameSpinStart = async ({ game, gameCtrl, user, result, ws, db }) => {
     );
     return { updatedGame: uGame, updatedUser: uUser };
   });
-  const gameJson = gameCtrl.convertGameToJson(game);
+  console.log(1, gameJson.won);
+  console.log(1, gameJson.lost);
   gameJson.spinInProgress = true;
   ws.send('*', 'GAME_UPDATED', { game: gameJson, user, reason: 'GAME_SPIN_START' });
   return { updatedUser, updatedGame };
