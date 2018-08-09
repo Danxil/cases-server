@@ -14,8 +14,6 @@ const gameSpinStart = async ({ game, gameCtrl, user, result, ws, db }) => {
     );
     return { updatedGame: uGame, updatedUser: uUser };
   });
-  console.log(1, gameJson.won);
-  console.log(1, gameJson.lost);
   gameJson.spinInProgress = true;
   ws.send('*', 'GAME_UPDATED', { game: gameJson, user, reason: 'GAME_SPIN_START' });
   return { updatedUser, updatedGame };
