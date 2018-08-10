@@ -1,4 +1,4 @@
-import { getStatisticBots } from '../../helpers/fakesUtils';
+import { getStatisticBots } from '../../controllers/fakes';
 
 export default () => (req, res) => {
   res.send(getStatisticBots());

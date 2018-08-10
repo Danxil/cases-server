@@ -1,7 +1,7 @@
 import checkGames from '../socketEvents/handlers/checkGames';
 import checkConnectedUsers from '../socketEvents/handlers/checkConnectedUsers';
 import addBot from '../socketEvents/handlers/addBot';
-import { updatePayments, updatePlaygroundBots, updateStatisticBots } from '../helpers/fakesUtils';
+import { updatePayments, updatePlaygroundBots, updateFakes } from '../controllers/fakes';
 import {
   GAME_CHECK_ALIVE_GAMES_INTERVAL,
   GAME_ADD_BOT_INTERVAL,
@@ -23,7 +23,6 @@ export default async ({ gameCtrl, userCtrl, ws, db }) => {
 
   await checkConnectedUsers({ gameCtrl, ws });
   setInterval(async () => {
-    console.log('memory', process.memoryUsage().rss);
     try {
       await checkConnectedUsers({ gameCtrl, ws });
     } catch (e) {
@@ -49,7 +48,7 @@ export default async ({ gameCtrl, userCtrl, ws, db }) => {
 
   setInterval(async () => {
     try {
-      await updateStatisticBots();
+      await updateFakes();
     } catch (e) {
       console.log(e);
     }

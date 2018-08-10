@@ -25,5 +25,6 @@ export default async () => {
   db.sequelize = dbConnection;
   await dbConnection.sync();
   console.log('DB sync succes');
+  global.db = db;
   return db;
 };

@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { getPayments } from '../../helpers/fakesUtils';
+import { getPayments } from '../../controllers/fakes';
 import { MIN_PAYMENTS_TO_SHOW } from '../../gameConfig';
 
 export default ({ paymentsCtrl }) => async (req, res) => {

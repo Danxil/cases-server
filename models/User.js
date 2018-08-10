@@ -1,4 +1,7 @@
 import Sequelize from 'sequelize';
+import _ from 'lodash';
+import request from 'request-promise';
+import faker from 'faker';
 import { START_USER_BALANCE } from '../gameConfig';
 
 export default (sequelize) => {
@@ -66,11 +69,29 @@ export default (sequelize) => {
     photo: {
       type: Sequelize.STRING,
     },
+    bot: {
+      type: Sequelize.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
   }, {
     name: {
       singular: 'user',
       plural: 'users',
     },
+  });
+
+  User.beforeValidate(async (user) => {
+    if (user.bot && !user.photo) {
+      try {
+        const randomUser = await request('https://randomuser.me/api/');
+        user.photo = JSON.parse(randomUser).results[0].picture.thumbnail;
+      } catch (e) {
+        user.photo = 0;
+      }
+      user.displayName = `${faker.name.firstName()} ${faker.name.lastName()}`;
+      user.balance = _.random(1000, 5000);
+    }
   });
 
   User.prototype.verifyPassword = function (password) {

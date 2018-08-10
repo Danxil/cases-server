@@ -13,11 +13,4 @@ export default class UserCtrl {
 
     return this.db.User.create({ email, password });
   }
-  async createBot() {
-    const result = await this.db.User.findOrCreate({
-      defaults: { id: 777, balance: 1000000000 },
-      where: { id: 777 },
-    });
-    return result[0];
-  }
 }

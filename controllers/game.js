@@ -2,16 +2,15 @@ import autoBind from 'auto-bind';
 import moment from 'moment';
 import {
   getRandomPlaygroundBot,
-} from '../helpers/fakesUtils';
+} from './fakes';
 import { GAME_USER_TIMEOUT, GAME_MIN_ALIVE_GAMES_AMOUNT } from '../gameConfig';
 
 const debug = require('debug')('game');
 
 export default class GameCtrl {
-  constructor({ db, userCtrl }) {
+  constructor({ db }) {
     autoBind(this);
     this.db = db;
-    this.userCtrl = userCtrl;
   }
 
   async findGame({ gameId }) {
@@ -40,16 +39,15 @@ export default class GameCtrl {
   }
   async checkAndDisconnectConnectedGameUser({ game }) {
     if (!game.lastTouchAt || game.spinInProgress) return null;
-
     const expireTime = moment(game.lastTouchAt).add(GAME_USER_TIMEOUT).format();
     const now = moment(new Date()).format();
-
     if (expireTime > now) return null;
     debug(`Game user disconnected. gamedId: ${game.id}, userId: ${game.connectedUserId}`);
+    const { connectedUserId, id: gameId } = game;
     await game.update({ lastTouchAt: null, connectedUserId: null });
     const obj = {
-      gameId: game.id,
-      userId: game.connectedUserId,
+      gameId,
+      userId: connectedUserId,
     };
     return obj;
   }
@@ -148,18 +146,12 @@ export default class GameCtrl {
   }
 
   async createGame({ defaults = {} } = {}) {
-    let user;
-    if (!defaults.creatorUserId) {
-      user = await this.userCtrl.createBot();
-      const bot = getRandomPlaygroundBot();
-      if (bot) {
-        user.photo = bot.photo;
-        user.displayName = bot.displayName;
-      }
-      defaults.creatorUserId = user.id;
+    const bot = getRandomPlaygroundBot();
+    if (!defaults.creatorUserId && bot) {
+      defaults.creatorUserId = bot.id;
     }
     const game = await this.db.Game.create(defaults);
-    game.creatorUser = user;
+    game.creatorUser = bot;
     debug(`Game created. gameId: ${game.id}`);
     return game;
   }

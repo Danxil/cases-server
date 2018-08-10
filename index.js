@@ -20,12 +20,13 @@ import WS from './services/ws';
 import GameCtrl from './controllers/game';
 import UserCtrl from './controllers/user';
 import initData from './socketEvents/handlers/initData';
+import { updateFakes } from './controllers/fakes';
 /* eslint-enable import/first */
 
 const app = express();
 configureDb().then(async (db) => {
   app.use(cors({
-    origin: [process.env.CLIENT_BASE_URL],
+    origin: process.env.CLIENT_BASE_URL.split(','),
     credentials: true,
   }));
   app.use(cookieParser());
@@ -49,6 +50,7 @@ configureDb().then(async (db) => {
     ({ user, ws: wsService }) => initData({ user, ws: wsService, gameCtrl }),
   );
 
+  await updateFakes();
   await configureSchedules({ gameCtrl, userCtrl, ws, db });
 
   routes({ app, ws, db, userCtrl, paymentsCtrl });

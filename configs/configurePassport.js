@@ -91,7 +91,7 @@ const verify = ({ service, db }) => async (
         email: getEmailField({ service, profile, params }),
         photo: getPhotoField({ service, profile }),
       },
-      where: { [`${service}Id`]: profile.id.toString() },
+      where: { [`${service}Id`]: profile.id.toString(), bot: false },
     });
     const user = result[0];
     cb(null, user);
@@ -175,7 +175,7 @@ export default ({ db, app }) => {
 
   passport.deserializeUser(async (id, done) => {
     try {
-      const user = await db.User.findOne({ where: { id } });
+      const user = await db.User.findOne({ where: { id, bot: false } });
       done(null, user);
     } catch (err) {
       done(err);
