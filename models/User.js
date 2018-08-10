@@ -4,6 +4,10 @@ import request from 'request-promise';
 import faker from 'faker';
 import { START_USER_BALANCE } from '../gameConfig';
 
+function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
 export default (sequelize) => {
   const User = sequelize.define('User', {
     twitterId: {
@@ -84,8 +88,10 @@ export default (sequelize) => {
   User.beforeValidate(async (user) => {
     if (user.bot && !user.photo) {
       try {
-        const randomUser = await request('https://randomuser.me/api/');
+        const randomUserJson = await request('https://randomuser.me/api/');
+        const randomUser = JSON.parse(randomUserJson).results[0];
         user.photo = JSON.parse(randomUser).results[0].picture.thumbnail;
+        user.displayName = `${capitalizeFirstLetter(randomUser.name.first)} ${capitalizeFirstLetter(randomUser.name.last)}`;
       } catch (e) {
         user.photo = 0;
       }
