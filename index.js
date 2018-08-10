@@ -4,6 +4,7 @@ dotenv.config()
 
 /* eslint-disable import/first */
 import express from 'express';
+import expressSslify from 'express-sslify';
 import passport from 'passport';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
@@ -23,7 +24,11 @@ import initData from './socketEvents/handlers/initData';
 import { updateFakes } from './controllers/fakes';
 /* eslint-enable import/first */
 
+
 const app = express();
+
+app.use(expressSslify.HTTPS());
+
 configureDb().then(async (db) => {
   app.use(cors({
     origin: process.env.CLIENT_BASE_URL.split(','),
