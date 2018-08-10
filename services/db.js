@@ -8,7 +8,7 @@ export default async () => {
       sync: { force: process.env.NODE_ENV !== 'production' },
       logging: false,
       pool: {
-        max: 5,
+        max: 10,
         min: 0,
         acquire: 30000,
       },
