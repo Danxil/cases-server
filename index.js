@@ -26,8 +26,7 @@ import { updateFakes } from './controllers/fakes';
 
 
 const app = express();
-
-app.use(expressSslify.HTTPS({ trustProtoHeader: true }));
+if (process.env.NODE_ENV === 'production') app.use(expressSslify.HTTPS({ trustProtoHeader: true }));
 
 configureDb().then(async (db) => {
   app.use(cors({
