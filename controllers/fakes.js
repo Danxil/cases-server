@@ -23,7 +23,7 @@ export const generateStatisticBots = async (amount) => {
   return result;
 }
 export const getRandomStatisticBot = () => _.sample(statisticBots);
-export const getStatisticBots = () => statisticBots.sort((a, b) => {
+export const getStatisticBots = () => statisticBots.filter(o => o.balance >= 10).sort((a, b) => {
   return a.balance > b.balance ? -1 : 1;
 });
 
