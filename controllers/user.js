@@ -10,7 +10,6 @@ export default class UserCtrl {
     if (user) {
       throw new Error(`User with email ${email} is already exist`);
     }
-
     return this.db.User.create({ email, password });
   }
 }
