@@ -1,4 +1,12 @@
 {
   "presets": ["env", "stage-3"],
-  "plugins": ["transform-async-to-generator"]
+  "plugins": [
+    "transform-async-to-generator",
+    [
+      "babel-plugin-dotenv",
+      {
+        "replacedModuleName": "babel-dotenv"
+      }
+    ]
+  ]
 }

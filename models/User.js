@@ -1,12 +1,7 @@
 import Sequelize from 'sequelize';
 import _ from 'lodash';
-import request from 'request-promise';
 import faker from 'faker';
 import { START_USER_BALANCE } from '../gameConfig';
-
-function capitalizeFirstLetter(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
-}
 
 export default (sequelize) => {
   const User = sequelize.define('User', {
