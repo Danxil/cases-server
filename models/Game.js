@@ -1,11 +1,13 @@
 import Sequelize from 'sequelize';
 import _ from 'lodash';
+import moment from 'moment';
 import AES from 'crypto-js/aes';
 import { getRisk } from '../helpers/gameUtils';
 import {
   GAME_MIN_CHANCE_TO_WIN,
   GAME_MAX_CHANCE_TO_WIN,
-  GAME_MAX_ATTEMPTS,
+  // GAME_MAX_ATTEMPTS,
+  GAME_GAME_SPIN_DELAY,
   GAME_MIN_PRIZE,
   GAME_MAX_PRIZE,
 } from '../gameConfig';
@@ -59,6 +61,12 @@ export default (sequelize) => {
 
   Game.prototype.isMaxAttemptsReached = function () {
     return this.won + this.lost >= this.maxAttempts;
+  };
+  Game.prototype.isGameTimeoutReached = function () {
+    if (!this.spinInProgress) return false;
+    const now = moment(new Date()).format();
+    const expire = moment(this.lastTouchAt).add(GAME_GAME_SPIN_DELAY * 2, 'ms').format();
+    return now >= expire;
   };
 
   Game.prototype.getAttemptsAmount = function () {
