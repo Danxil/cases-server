@@ -9,9 +9,7 @@ export default async ({
   db,
   gameCtrl,
 }) => {
-  return;
   const notExpiredGames = await gameCtrl.getNotExpiredGames();
-
   const gamesNotInProgress = notExpiredGames.filter(o => !o.connectedUserId);
 
   if (

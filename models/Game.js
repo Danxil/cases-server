@@ -79,7 +79,8 @@ export default (sequelize) => {
       game.chanceToWin = _.random(GAME_MIN_CHANCE_TO_WIN, GAME_MAX_CHANCE_TO_WIN);
     }
     if (!game.maxAttempts) {
-      game.maxAttempts = _.random(1, GAME_MAX_ATTEMPTS);
+      // game.maxAttempts = _.random(1, GAME_MAX_ATTEMPTS);
+      game.maxAttempts = 3;
     }
     if (!game.prize) {
       game.prize = _.random(GAME_MIN_PRIZE, GAME_MAX_PRIZE);

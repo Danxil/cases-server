@@ -87,15 +87,19 @@ export default (sequelize) => {
 
   User.beforeValidate(async (user) => {
     if (user.bot && !user.photo) {
-      try {
-        const randomUserJson = await request('https://randomuser.me/api/');
-        const randomUser = JSON.parse(randomUserJson).results[0];
-        user.photo = JSON.parse(randomUser).results[0].picture.thumbnail;
-        user.displayName = `${capitalizeFirstLetter(randomUser.name.first)} ${capitalizeFirstLetter(randomUser.name.last)}`;
-      } catch (e) {
-        user.photo = 0;
-      }
-      user.displayName = `${faker.name.firstName()} ${faker.name.lastName()}`;
+      // try {
+      //   const randomUserJson = await request('https://randomuser.me/api/');
+      //   const randomUser = JSON.parse(randomUserJson).results[0];
+      //   user.photo = JSON.parse(randomUser).results[0].picture.thumbnail;
+      //   user.displayName = `${capitalizeFirstLetter(randomUser.name.first)}
+      // ${capitalizeFirstLetter(randomUser.name.last)}`;
+      // } catch (e) {
+      //   user.photo = 0;
+      // }
+      // user.displayName = `${faker.name.firstName()} ${faker.name.lastName()}`;
+      const card = faker.helpers.contextualCard();
+      user.photo = card.avatar;
+      user.displayName = `${card.name} ${faker.name.lastName()}`;
       user.balance = _.random(1000, 5000);
     }
   });

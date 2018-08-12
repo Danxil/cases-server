@@ -49,7 +49,7 @@ export default async ({
 }) => {
   const { gameId, result } = payload;
   const game = await gameCtrl.findGame({ gameId });
-  const checkResult = await gameCtrl.checkBeforeNotificationGameSpin({ user, game });
+  const checkResult = await gameCtrl.checkBeforeGameAction({ user, game });
   if (!checkResult) return;
   const {
     updatedUser,

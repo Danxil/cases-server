@@ -111,20 +111,20 @@ export default class GameCtrl {
     return targetGame;
   }
 
-  async checkBeforeNotificationGameSpin({ user, gameId, game: gameToUse }) {
+  async checkBeforeGameAction({ user, gameId, game: gameToUse }) {
     const game = await this.getGame({ gameId, game: gameToUse });
     if (!game) return false;
     if (game.risk > user.balance) {
-      debug(`Game spin impossible. Low balance. gameId: ${game.id}, userId: ${user.id}`);
+      debug(`Game action impossible. Low balance. gameId: ${game.id}, userId: ${user.id}`);
       return false;
     }
 
     if (game.spinInProgress) {
-      debug(`Game spin impossible. Game spin already in progress. gameId ${game.id}, userId: ${user.id}`);
+      debug(`Game action impossible. Game spin already in progress. gameId ${game.id}, userId: ${user.id}`);
       return false;
     }
     if (game.isMaxAttemptsReached()) {
-      debug(`Game spin impossible. Max attempts is reached. gameId: ${game.id}, userId: ${user.id}`);
+      debug(`Game action impossible. Max attempts is reached. gameId: ${game.id}, userId: ${user.id}`);
       return false;
     }
     return true;
