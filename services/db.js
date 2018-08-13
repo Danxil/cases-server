@@ -12,6 +12,8 @@ export default async () => {
       pool: {
         max: 5,
         min: 1,
+        acquire: 20000,
+        evict: 2000,
       },
     },
   );
