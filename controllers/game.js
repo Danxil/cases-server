@@ -53,13 +53,13 @@ export default class GameCtrl {
   }
 
   async checkAndExpireNotExpiredGame({ game }) {
-    if (game.spinInProgress) return {};
-
     if (game.isGameTimeoutReached()) {
       debug(`Game timeout reached. gamedId: ${game.id}`);
       await this.expireGame({ game });
       return { expiredGame: game };
     }
+
+    if (game.spinInProgress) return {};
 
     if (game.isMaxAttemptsReached()) {
       debug(`Max attempts reached. gamedId: ${game.id}`);
@@ -82,7 +82,7 @@ export default class GameCtrl {
 
   async checkAndExpireNotExpiredGames() {
     const notExpiredGames = await this.getNotExpiredGames();
-    console.log('games length', notExpiredGames.length);
+
     const results = await Promise.all(
       notExpiredGames.map(game => this.checkAndExpireNotExpiredGame({ game })),
     );
