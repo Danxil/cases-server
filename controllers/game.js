@@ -1,7 +1,8 @@
 import autoBind from 'auto-bind';
 import moment from 'moment';
 import {
-  getRandomPlaygroundBot,
+  getRandomBot,
+  generateBot,
 } from './fakes';
 import { GAME_USER_TIMEOUT, GAME_MIN_ALIVE_GAMES_AMOUNT } from '../gameConfig';
 
@@ -144,6 +145,9 @@ export default class GameCtrl {
 
   async expireGame({ game }) {
     debug(`Game expired. gameId: ${game.id}`);
+    if (game.creatorUser && game.creatorUser.bot) {
+      await game.creatorUser.destroy();
+    }
     await game.destroy({ force: true });
     if (game.isMaxAttemptsReached() || !game.creatorUserId) return null;
     const updatedCreatorUser = await game.creatorUser.update({
@@ -153,7 +157,7 @@ export default class GameCtrl {
   }
 
   async createGame({ defaults = {} } = {}) {
-    const bot = getRandomPlaygroundBot();
+    const bot = await generateBot();
     if (!defaults.creatorUserId && bot) {
       defaults.creatorUserId = bot.id;
     }

@@ -1,14 +1,12 @@
 import checkGames from '../socketEvents/handlers/checkGames';
 import checkConnectedUsers from '../socketEvents/handlers/checkConnectedUsers';
 import addBot from '../socketEvents/handlers/addBot';
-import { updatePayments, updatePlaygroundBots, updateFakes } from '../controllers/fakes';
+import { updateFakes } from '../controllers/fakes';
 import {
   GAME_CHECK_ALIVE_GAMES_INTERVAL,
   GAME_ADD_BOT_INTERVAL,
-  GAME_UPDATE_PLAYGROUND_BOTS_INTERVAL,
-  UPDATE_STATISTIC_BOTS_INTERVAL,
+  GAME_UPDATE_FAKES_INTERVAL,
   GAME_CHECK_CONNECTED_USERS_INTERVAL,
-  UPDATE_PAYMENTS_FAKES_INTERVAL,
 } from '../gameConfig';
 
 export default async ({ gameCtrl, userCtrl, ws, db }) => {
@@ -40,25 +38,9 @@ export default async ({ gameCtrl, userCtrl, ws, db }) => {
 
   setInterval(async () => {
     try {
-      await updatePlaygroundBots();
-    } catch (e) {
-      console.log(e);
-    }
-  }, GAME_UPDATE_PLAYGROUND_BOTS_INTERVAL);
-
-  setInterval(async () => {
-    try {
       await updateFakes();
     } catch (e) {
       console.log(e);
     }
-  }, UPDATE_STATISTIC_BOTS_INTERVAL);
-
-  setInterval(async () => {
-    try {
-      await updatePayments();
-    } catch (e) {
-      console.log(e);
-    }
-  }, UPDATE_PAYMENTS_FAKES_INTERVAL);
+  }, GAME_UPDATE_FAKES_INTERVAL);
 };

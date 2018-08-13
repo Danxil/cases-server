@@ -1,5 +1,8 @@
-import { getStatisticBots } from '../../controllers/fakes';
+import { getBots } from '../../controllers/fakes';
 
 export default () => (req, res) => {
-  res.send(getStatisticBots());
+  const statisticBots = getBots().filter(o => o.balance >= 10).sort((a, b) => {
+    return a.balance > b.balance ? -1 : 1;
+  });
+  res.send(statisticBots);
 };

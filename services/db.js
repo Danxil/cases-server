@@ -1,6 +1,8 @@
 import Sequelize from 'sequelize';
 import models from '../models';
 
+require('dotenv').config();
+
 export default async () => {
   const dbConnection = new Sequelize(
     process.env.DATABASE_URL,

@@ -1,5 +1,3 @@
-// eslint-disable-next-line import/no-unresolved, import/extensions
-import 'babel-dotenv';
 import express from 'express';
 import expressSslify from 'express-sslify';
 import passport from 'passport';
@@ -19,6 +17,8 @@ import GameCtrl from './controllers/game';
 import UserCtrl from './controllers/user';
 import initData from './socketEvents/handlers/initData';
 import { updateFakes } from './controllers/fakes';
+
+require('dotenv').config();
 
 const app = express();
 if (process.env.NODE_ENV === 'production') app.use(expressSslify.HTTPS({ trustProtoHeader: true }));

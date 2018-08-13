@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import gameSpin from './gameSpin';
 import gameUserConnect from './gameUserConnect';
-import { getRandomPlaygroundBot } from '../../controllers/fakes';
+import { getRandomBot } from '../../controllers/fakes';
 import { GAME_MIN_ALIVE_GAMES_AMOUNT } from '../../gameConfig';
 
 export default async ({
@@ -18,7 +18,7 @@ export default async ({
       GAME_MIN_ALIVE_GAMES_AMOUNT / 3,
     )
   ) return;
-  const user = getRandomPlaygroundBot();
+  const user = getRandomBot();
   if (!user) return;
 
   const { id: gameId, chanceToWin, prize, risk } = _.sample(gamesNotInProgress);
