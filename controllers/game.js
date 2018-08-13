@@ -1,10 +1,9 @@
 import autoBind from 'auto-bind';
 import moment from 'moment';
 import {
-  getRandomBot,
   generateBot,
 } from './fakes';
-import { GAME_USER_TIMEOUT, GAME_MIN_ALIVE_GAMES_AMOUNT } from '../gameConfig';
+import { GAME_USER_TIMEOUT, GAME_MIN_ALIVE_GAMES_AMOUNT, GAME_CHECK_DELLAY } from '../gameConfig';
 
 const debug = require('debug')('game');
 
@@ -61,8 +60,10 @@ export default class GameCtrl {
     }
 
     if (game.spinInProgress) return {};
-
-    if (game.isMaxAttemptsReached()) {
+    if (
+      game.isMaxAttemptsReached() &&
+      moment(game.updatedAt).add(GAME_CHECK_DELLAY, 'ms').format() <= moment().format()
+    ) {
       debug(`Max attempts reached. gamedId: ${game.id}`);
       const userToUpdate = await this.expireGame({ game });
       return { expiredGame: game, userToUpdate };

@@ -6,11 +6,13 @@ import { getRisk } from '../helpers/gameUtils';
 import {
   GAME_MIN_CHANCE_TO_WIN,
   GAME_MAX_CHANCE_TO_WIN,
-  // GAME_MAX_ATTEMPTS,
+  GAME_MAX_ATTEMPTS,
   GAME_GAME_SPIN_DELAY,
   GAME_MIN_PRIZE,
   GAME_MAX_PRIZE,
 } from '../gameConfig';
+
+require('dotenv').config();
 
 export default (sequelize) => {
   const Game = sequelize.define('Game', {
@@ -88,8 +90,9 @@ export default (sequelize) => {
     }
     if (!game.maxAttempts) {
       // game.maxAttempts = _.random(1, GAME_MAX_ATTEMPTS);
-      game.maxAttempts = 3;
+      game.maxAttempts = GAME_MAX_ATTEMPTS;
     }
+
     if (!game.prize) {
       game.prize = _.random(GAME_MIN_PRIZE, GAME_MAX_PRIZE);
     }
@@ -101,7 +104,7 @@ export default (sequelize) => {
       new Array(game.maxAttempts - lengthLooseItems).fill(1),
     )).join('');
     game.schema = AES.encrypt(schema, 'dAfg$1397642gsge_39').toString();
-    /* eslint-disable no-param-reassign */
+    /* eslint-enable no-param-reassign */
   });
 
   return Game;
