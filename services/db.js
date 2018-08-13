@@ -8,7 +8,6 @@ export default async () => {
     process.env.DATABASE_URL,
     {
       sync: { force: process.env.NODE_ENV !== 'production' },
-      logging: false,
       pool: {
         max: 5,
         min: 1,
