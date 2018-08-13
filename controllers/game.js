@@ -82,6 +82,7 @@ export default class GameCtrl {
 
   async checkAndExpireNotExpiredGames() {
     const notExpiredGames = await this.getNotExpiredGames();
+    console.log('games length', notExpiredGames.length);
     const results = await Promise.all(
       notExpiredGames.map(game => this.checkAndExpireNotExpiredGame({ game })),
     );
