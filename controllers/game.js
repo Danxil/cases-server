@@ -145,7 +145,7 @@ export default class GameCtrl {
   async expireGame({ game }) {
     debug(`Game expired. gameId: ${game.id}`);
     await game.destroy({ force: true });
-    if (game.isMaxAttemptsReached()) return null;
+    if (game.isMaxAttemptsReached() || !game.creatorUserId) return null;
     const updatedCreatorUser = await game.creatorUser.update({
       balance: game.creatorUser.balance + (game.getLeftAttemptsAmount() * game.prize),
     });
