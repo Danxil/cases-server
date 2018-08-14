@@ -31,8 +31,7 @@ configureDb().then(async (db) => {
   app.use(cookieParser());
   app.use(bodyParser.json({ extended: true }));
 
-  const sessionParser = configureSessions();
-  app.use(sessionParser);
+  const sessionParser = await configureSessions({ app });
   app.use(passport.initialize());
   app.use(passport.session());
   app.use(express.static(path.join(__dirname, 'client'), { index: false, extensions: false, redirect: false }));
@@ -49,7 +48,7 @@ configureDb().then(async (db) => {
     ({ user, ws: wsService }) => initData({ user, ws: wsService, gameCtrl }),
   );
 
-  await updateFakes();
+  // await updateFakes();
   await configureSchedules({ gameCtrl, userCtrl, ws, db });
 
   routes({ app, ws, db, userCtrl, paymentsCtrl });
