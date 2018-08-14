@@ -38,7 +38,7 @@ configureDb().then(async (db) => {
   configurePassport({ db, app });
 
   const server = app.listen(process.env.PORT, () => console.log('REST started'));
-
+  server.close()
   const userCtrl = new UserCtrl({ db });
   const gameCtrl = new GameCtrl({ db, userCtrl });
   const paymentsCtrl = new PaymentsCtrl({ db });
@@ -57,3 +57,17 @@ configureDb().then(async (db) => {
 }).catch((e) => {
   console.log('App start failed!', e);
 });
+
+
+process.on('SIGTERM', async () => {
+  console.log('SIGTERM');
+  try {
+    await global.db.sequelize.close();
+  } catch (e) {
+    console.log('SIGTERM failed');
+    console.log(e);
+  }
+  console.log('SIGTERM done');
+  process.exit();
+});
+
