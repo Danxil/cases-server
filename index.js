@@ -47,7 +47,7 @@ configureDb().then(async (db) => {
     ({ user, ws: wsService }) => initData({ user, ws: wsService, gameCtrl }),
   );
 
-  // await updateFakes();
+  await updateFakes();
   await configureSchedules({ gameCtrl, userCtrl, ws, db });
 
   routes({ app, ws, db, userCtrl, paymentsCtrl });
