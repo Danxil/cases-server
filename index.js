@@ -38,7 +38,6 @@ configureDb().then(async (db) => {
   configurePassport({ db, app });
 
   const server = app.listen(process.env.PORT, () => console.log('REST started'));
-  server.close()
   const userCtrl = new UserCtrl({ db });
   const gameCtrl = new GameCtrl({ db, userCtrl });
   const paymentsCtrl = new PaymentsCtrl({ db });
