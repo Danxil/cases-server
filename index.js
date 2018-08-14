@@ -59,15 +59,15 @@ configureDb().then(async (db) => {
 });
 
 
-process.on('SIGTERM', async () => {
+process.on('SIGTERM', () => {
   console.log('SIGTERM');
-  try {
-    await global.db.sequelize.close();
-  } catch (e) {
-    console.log('SIGTERM failed');
-    console.log(e);
-  }
-  console.log('SIGTERM done');
-  process.exit();
+  global.db.sequelize.close()
+  .then(() => {
+    console.log('SIGTERM done');
+    return process.exit(0);
+  })
+  .catch((err) => {
+    console.log('SIGTERM failed', err);
+  });
 });
 
