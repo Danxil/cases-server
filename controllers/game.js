@@ -154,7 +154,7 @@ export default class GameCtrl {
     const updatedCreatorUser = await game.creatorUser.update({
       balance: game.creatorUser.balance + (game.getLeftAttemptsAmount() * game.prize),
     });
-    return updatedCreatorUser;
+    return { updatedCreatorUser, createdGame: null };
   }
 
   async createGame({ defaults = {} } = {}) {

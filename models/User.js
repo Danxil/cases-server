@@ -80,6 +80,10 @@ export default (sequelize) => {
     },
   });
 
+  User.associate = (models) => {
+    models.User.hasOne(models.Game, { foreignKey: 'creatorUserId', as: 'createdGame' });
+  };
+
   User.beforeValidate(async (user) => {
     if (user.bot && !user.photo) {
       const card = faker.helpers.contextualCard();
