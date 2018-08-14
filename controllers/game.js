@@ -158,12 +158,10 @@ export default class GameCtrl {
   }
 
   async createGame({ defaults = {} } = {}) {
-    const bot = await generateBot();
-    if (!defaults.creatorUserId && bot) {
-      defaults.creatorUserId = bot.id;
-    }
     const game = await this.db.Game.create(defaults);
-    game.creatorUser = bot;
+    if (game.creatorUserId) {
+      game.creatorUser = await game.getCreatorUser();
+    }
     debug(`Game created. gameId: ${game.id}`);
     return game;
   }
