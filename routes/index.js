@@ -5,6 +5,7 @@ import userHandler from './handlers/user';
 import logoutHandler from './handlers/logout';
 import statisticHandler from './handlers/statistic';
 import paymentsHandler from './handlers/payments';
+import getPurchases from './handlers/getPurchases';
 import createPaymentHandler from './handlers/createPayment';
 
 const authorization = (req, res, next) => {
@@ -20,6 +21,7 @@ export default ({ app, userCtrl, paymentsCtrl, ws }) => {
   app.get(`${process.env.API_PREFIX}/logout`, authorization, logoutHandler());
   app.get(`${process.env.API_PREFIX}/statistic`, statisticHandler());
   app.get(`${process.env.API_PREFIX}/payments`, paymentsHandler({ paymentsCtrl }));
+  app.get(`${process.env.API_PREFIX}/purchases`, getPurchases());
   app.post(`${process.env.API_PREFIX}/user/:userId/payments`, createPaymentHandler({ paymentsCtrl, ws }));
   app.get('/*', (req, res) => {
     res.sendFile(path.join(__dirname, '../', 'client', 'index.html'));
