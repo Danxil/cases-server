@@ -1,3 +1,5 @@
 export default () => (req, res) => {
-  res.send(req.logout());
+  req.logout();
+  res.clearCookie('connect.sid');
+  res.sendStatus(200);
 };

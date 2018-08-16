@@ -1,4 +1,3 @@
-import express from 'express';
 import path from 'path';
 import signUpHandler from './handlers/signUp';
 import userHandler from './handlers/user';
