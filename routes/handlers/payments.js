@@ -1,6 +1,6 @@
 import _ from 'lodash';
-import { getHistory } from '../../controllers/fakes';
-import { getPayments } from '../../controllers/payments';
+import { getPayments } from '../../controllers/fakes';
+import { getHistory } from '../../controllers/payments';
 import { MIN_PAYMENTS_TO_SHOW } from '../../gameConfig';
 
 export default () => async (req, res) => {

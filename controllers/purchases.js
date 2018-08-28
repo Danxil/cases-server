@@ -1,5 +1,5 @@
 export const getHistory = async ({ filter }) => {
-  const history = await global.db.Purchases.findAll({
+  const history = await global.db.Purchase.findAll({
     where: { ...filter },
   });
   return history;
