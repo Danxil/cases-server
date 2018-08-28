@@ -5,7 +5,8 @@ import logoutHandler from './handlers/logout';
 import statisticHandler from './handlers/statistic';
 import paymentsHandler from './handlers/payments';
 import getPurchases from './handlers/getPurchases';
-import createPaymentHandler from './handlers/createPayment';
+import withdrawHandler from './handlers/createPayment';
+import paymentHandler from './handlers/payment';
 
 const authorization = (req, res, next) => {
   if (!req.isAuthenticated()) {
@@ -14,14 +15,16 @@ const authorization = (req, res, next) => {
   return next();
 };
 
-export default ({ app, userCtrl, paymentsCtrl, ws }) => {
+export default ({ app, userCtrl }) => {
   app.post(`${process.env.API_PREFIX}/sign-up`, signUpHandler({ userCtrl }));
   app.get(`${process.env.API_PREFIX}/user`, authorization, userHandler());
   app.get(`${process.env.API_PREFIX}/logout`, authorization, logoutHandler());
   app.get(`${process.env.API_PREFIX}/statistic`, statisticHandler());
-  app.get(`${process.env.API_PREFIX}/payments`, paymentsHandler({ paymentsCtrl }));
+  app.get(`${process.env.API_PREFIX}/payments`, paymentsHandler());
   app.get(`${process.env.API_PREFIX}/purchases`, getPurchases());
-  app.post(`${process.env.API_PREFIX}/user/:userId/payments`, createPaymentHandler({ paymentsCtrl, ws }));
+  app.post(`${process.env.API_PREFIX}/free-kassa/info`, paymentHandler());
+  app.get(`${process.env.API_PREFIX}/free-kassa/success`, paymentHandler());
+  app.post(`${process.env.API_PREFIX}/user/:userId/payments`, withdrawHandler());
   app.get('/*', (req, res) => {
     res.sendFile(path.join(__dirname, '../', 'client', 'index.html'));
   });

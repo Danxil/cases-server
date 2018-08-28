@@ -1,10 +1,11 @@
 import _ from 'lodash';
-import { getPayments } from '../../controllers/fakes';
+import { getHistory } from '../../controllers/fakes';
+import { getPayments } from '../../controllers/payments';
 import { MIN_PAYMENTS_TO_SHOW } from '../../gameConfig';
 
-export default ({ paymentsCtrl }) => async (req, res) => {
+export default () => async (req, res) => {
   const filter = JSON.parse(req.query.filter);
-  const history = await paymentsCtrl.getHistory({ filter });
+  const history = await getHistory({ filter });
   const fakePaymentsLength = history.length < MIN_PAYMENTS_TO_SHOW && !filter.userId ?
     MIN_PAYMENTS_TO_SHOW - history.length :
     0;

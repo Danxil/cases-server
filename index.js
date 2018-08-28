@@ -40,7 +40,6 @@ configureDb().then(async (db) => {
   const server = app.listen(process.env.PORT, () => console.log('REST started'));
   const userCtrl = new UserCtrl({ db });
   const gameCtrl = new GameCtrl({ db, userCtrl });
-  const paymentsCtrl = new PaymentsCtrl({ db });
 
   const ws = new WS({ server, sessionParser, db }).on(
     'connection',
@@ -50,7 +49,7 @@ configureDb().then(async (db) => {
   await updateFakes();
   await configureSchedules({ gameCtrl, userCtrl, ws, db });
 
-  routes({ app, ws, db, userCtrl, paymentsCtrl });
+  routes({ app, userCtrl });
   socketEvents({ ws, db, gameCtrl, userCtrl });
   return null;
 }).catch((e) => {

@@ -27,7 +27,7 @@ export default class WS {
     this.userIdSocketMap = {};
 
     this.wsServer.on('connection', this.connectionCb);
-
+    global.ws = this;
     return this;
   }
 
