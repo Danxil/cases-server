@@ -22,7 +22,7 @@ export default ({ app, userCtrl }) => {
   app.get(`${process.env.API_PREFIX}/statistic`, statisticHandler());
   app.get(`${process.env.API_PREFIX}/payments`, paymentsHandler());
   app.get(`${process.env.API_PREFIX}/purchases`, getPurchases());
-  app.post(`${process.env.API_PREFIX}/free-kassa/info`, paymentHandler());
+  app.get(`${process.env.API_PREFIX}/free-kassa/info`, paymentHandler());
   app.get(`${process.env.API_PREFIX}/free-kassa/success`, paymentHandler());
   app.get(`${process.env.API_PREFIX}/user/:userId/payments`, withdrawHandler());
   app.get('/*', (req, res) => {
