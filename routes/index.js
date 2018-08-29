@@ -6,7 +6,7 @@ import statisticHandler from './handlers/statistic';
 import paymentsHandler from './handlers/payments';
 import getPurchases from './handlers/getPurchases';
 import withdrawHandler from './handlers/createPayment';
-import paymentHandler from './handlers/payment';
+import paymentHandler from './handlers/createPurchase';
 
 const authorization = (req, res, next) => {
   if (!req.isAuthenticated()) {
