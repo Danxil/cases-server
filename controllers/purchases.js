@@ -5,6 +5,6 @@ export const getHistory = async ({ filter }) => {
   return history;
 }
 export const createPurchase = async ({ amount, userId, status }) => {
-  const payment = await global.db.Purchases.create({ amount, userId, status });
+  const payment = await global.db.Purchase.create({ amount, userId, status });
   return payment;
 }
