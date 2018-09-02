@@ -1,6 +1,6 @@
+import { createGame } from '../../controllers/game';
+
 export default async ({
-  ws,
-  gameCtrl,
   user,
   payload: {
     game,
@@ -8,7 +8,7 @@ export default async ({
 }) => {
   if (game.prize * game.maxAttempts > user.balance) return;
   const defaults = { ...game, creatorUserId: user.id };
-  const createdGame = await gameCtrl.createGame({ defaults });
+  const createdGame = await createGame({ defaults });
   if (!createdGame) return;
   let jsonGame = createdGame.toJSON();
   jsonGame = { ...jsonGame, creatorUser: user.toJSON() };
@@ -22,6 +22,6 @@ export default async ({
   });
   const updatedUserJson = await updatedUser.toJSON();
 
-  ws.send(user.id, 'USER_UPDATED', { ...updatedUserJson, createdGame });
-  ws.send('*', 'GAME_CREATED', { game: jsonGame });
+  global.ws.send(user.id, 'USER_UPDATED', { ...updatedUserJson, createdGame });
+  global.ws.send('*', 'GAME_CREATED', { game: jsonGame });
 };

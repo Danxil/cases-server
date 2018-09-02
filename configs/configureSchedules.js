@@ -9,32 +9,32 @@ import {
   GAME_CHECK_CONNECTED_USERS_INTERVAL,
 } from '../gameConfig';
 
-export default async ({ gameCtrl, userCtrl, ws, db }) => {
-  await checkGames({ gameCtrl, ws });
+export default async () => {
+  await checkGames();
   setInterval(async () => {
     try {
-      await checkGames({ gameCtrl, ws });
+      await checkGames();
     } catch (e) {
       console.log(e);
     }
   }, GAME_CHECK_ALIVE_GAMES_INTERVAL);
 
-  await checkConnectedUsers({ gameCtrl, ws });
+  await checkConnectedUsers();
   setInterval(async () => {
     try {
-      await checkConnectedUsers({ gameCtrl, ws });
+      await checkConnectedUsers();
     } catch (e) {
       console.log(e);
     }
   }, GAME_CHECK_CONNECTED_USERS_INTERVAL);
 
-  setInterval(async () => {
-    try {
-      await addBot({ gameCtrl, userCtrl, ws, db });
-    } catch (e) {
-      console.log(e);
-    }
-  }, GAME_ADD_BOT_INTERVAL);
+  // setInterval(async () => {
+  //   try {
+  //     await addBot();
+  //   } catch (e) {
+  //     console.log(e);
+  //   }
+  // }, GAME_ADD_BOT_INTERVAL);
 
   setInterval(async () => {
     try {

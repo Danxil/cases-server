@@ -1,8 +1,9 @@
 import { errorResponse } from '../../helpers/responses';
+import { signUp } from '../../controllers/user';
 
-export default ({ userCtrl }) => async (req, res) => {
+export default () => async (req, res) => {
   try {
-    const user = await userCtrl.signUp(req.body);
+    const user = await signUp(req.body);
     req.login(user, () => res.send(200));
   } catch (err) {
     console.error(err);

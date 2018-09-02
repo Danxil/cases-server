@@ -1,18 +1,17 @@
-export default async ({
-  ws,
-  gameCtrl,
-}) => {
+import { checkAndExpireNotExpiredGames } from '../../controllers/game';
+
+export default async () => {
   const {
     expiredGamesIds,
     createdGames,
     notifyUsersCreatorsIdsAboutGameExpired,
     usersToUpdate,
-  } = await gameCtrl.checkAndExpireNotExpiredGames();
+  } = await checkAndExpireNotExpiredGames();
   if (usersToUpdate.length) {
-    usersToUpdate.forEach(o => ws.send(o.id, 'USER_UPDATED', o));
+    usersToUpdate.forEach(o => global.ws.send(o.id, 'USER_UPDATED', o));
   }
   if (expiredGamesIds.length || createdGames.length) {
-    ws.send('*', 'PLAYGROUND_UPDATED', {
+    global.ws.send('*', 'PLAYGROUND_UPDATED', {
       expiredGamesIds,
       gameUsersDisconnected: [],
       createdGames: createdGames.map(o => ({

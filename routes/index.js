@@ -17,8 +17,8 @@ const authorization = (req, res, next) => {
   return next();
 };
 
-export default ({ app, userCtrl }) => {
-  app.post(`${process.env.API_PREFIX}/sign-up`, signUpHandler({ userCtrl }));
+export default ({ app }) => {
+  app.post(`${process.env.API_PREFIX}/sign-up`, signUpHandler());
   app.get(`${process.env.API_PREFIX}/user`, authorization, userHandler());
   app.get(`${process.env.API_PREFIX}/logout`, authorization, logoutHandler());
   app.get(`${process.env.API_PREFIX}/statistic`, statisticHandler());

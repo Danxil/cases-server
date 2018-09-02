@@ -1,12 +1,11 @@
-export default async ({
-  ws,
-  gameCtrl,
-}) => {
+import { checkAndDisconnectConnectedGameUsers } from '../../controllers/game'
+
+export default async () => {
   const {
     gameUsersDisconnected,
-  } = await gameCtrl.checkAndDisconnectConnectedGameUsers();
+  } = await checkAndDisconnectConnectedGameUsers();
   if (gameUsersDisconnected.length) {
-    ws.send('*', 'PLAYGROUND_UPDATED', {
+    global.ws.send('*', 'PLAYGROUND_UPDATED', {
       expiredGamesIds: [],
       gameUsersDisconnected,
       createdGames: [],

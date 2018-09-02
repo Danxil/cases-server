@@ -5,7 +5,6 @@ import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import path from 'path';
-import PaymentsCtrl from './controllers/payments';
 import routes from './routes';
 import socketEvents from './socketEvents';
 import configurePassport from './configs/configurePassport';
@@ -13,8 +12,6 @@ import configureSessions from './configs/configureSessions';
 import configureSchedules from './configs/configureSchedules';
 import configureDb from './services/db';
 import WS from './services/ws';
-import GameCtrl from './controllers/game';
-import UserCtrl from './controllers/user';
 import initData from './socketEvents/handlers/initData';
 import { updateFakes } from './controllers/fakes';
 
@@ -38,19 +35,17 @@ configureDb().then(async (db) => {
   configurePassport({ db, app });
 
   const server = app.listen(process.env.PORT, () => console.log('REST started'));
-  const userCtrl = new UserCtrl({ db });
-  const gameCtrl = new GameCtrl({ db, userCtrl });
 
-  const ws = new WS({ server, sessionParser, db }).on(
+  new WS({ server, sessionParser, db }).on(
     'connection',
-    ({ user, ws: wsService }) => initData({ user, ws: wsService, gameCtrl }),
+    ({ user, ws: wsService }) => initData({ user, ws: wsService }),
   );
 
   await updateFakes();
-  await configureSchedules({ gameCtrl, userCtrl, ws, db });
+  await configureSchedules();
 
-  routes({ app, userCtrl });
-  socketEvents({ ws, db, gameCtrl, userCtrl });
+  routes({ app });
+  socketEvents();
   return null;
 }).catch((e) => {
   console.log('App start failed!', e);

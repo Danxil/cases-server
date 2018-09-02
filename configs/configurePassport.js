@@ -77,7 +77,7 @@ const getAuthOptions = ({ service }) => {
   return options;
 };
 
-const verify = ({ service, db }) => async (
+const verify = ({ service }) => async (
   token,
   tokenSecret,
   params,
@@ -85,7 +85,7 @@ const verify = ({ service, db }) => async (
   cb,
 ) => {
   try {
-    const result = await db.User.findOrCreate({
+    const result = await global.db.User.findOrCreate({
       defaults: {
         displayName: profile.displayName,
         email: getEmailField({ service, profile, params }),
@@ -100,7 +100,7 @@ const verify = ({ service, db }) => async (
   }
 };
 
-const configureStrategy = ({ app, db }) => ({ service, Strategy }) => {
+const configureStrategy = ({ app }) => ({ service, Strategy }) => {
   const { appIdField, appSecretField } = getServiceAppConfigFields({ service });
   const serviceUpperCase = service.toUpperCase();
 
@@ -111,7 +111,7 @@ const configureStrategy = ({ app, db }) => ({ service, Strategy }) => {
       callbackURL: `${process.env.API_PREFIX}/auth/${service}/callback`,
       profileFields: getProfileFields({ service }),
     },
-    verify({ service, db }),
+    verify({ service }),
   ));
   app.get(
     `${process.env.API_PREFIX}/auth/${service}`,
@@ -129,9 +129,9 @@ const configureStrategy = ({ app, db }) => ({ service, Strategy }) => {
   );
 };
 
-const localStrategyVerify = ({ db }) => async (username, password, done) => {
+const localStrategyVerify = () => async (username, password, done) => {
   try {
-    const user = await db.User.findOne({ where: { email: username } });
+    const user = await global.db.User.findOne({ where: { email: username } });
     if (!user) {
       console.log('Authentication failed. User not found');
       return done(null, false);
@@ -147,12 +147,12 @@ const localStrategyVerify = ({ db }) => async (username, password, done) => {
   }
 };
 
-export default ({ db, app }) => {
-  const configureStrategyFn = configureStrategy({ app, db });
+export default ({ app }) => {
+  const configureStrategyFn = configureStrategy({ app });
 
   passport.use(new LocalStrategy(
     { usernameField: 'email', passwordField: 'password' },
-    localStrategyVerify({ db }),
+    localStrategyVerify(),
   ));
   app.post(
     `${process.env.API_PREFIX}/auth/local`,
@@ -175,7 +175,7 @@ export default ({ db, app }) => {
 
   passport.deserializeUser(async (id, done) => {
     try {
-      const user = await db.User.findOne({ where: { id, bot: false } });
+      const user = await global.db.User.findOne({ where: { id, bot: false } });
       done(null, user);
     } catch (err) {
       done(err);
