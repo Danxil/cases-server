@@ -28,13 +28,13 @@ export default async () => {
     }
   }, GAME_CHECK_CONNECTED_USERS_INTERVAL);
 
-  // setInterval(async () => {
-  //   try {
-  //     await addBot();
-  //   } catch (e) {
-  //     console.log(e);
-  //   }
-  // }, GAME_ADD_BOT_INTERVAL);
+  setInterval(async () => {
+    try {
+      await addBot();
+    } catch (e) {
+      console.log(e);
+    }
+  }, GAME_ADD_BOT_INTERVAL);
 
   setInterval(async () => {
     try {
