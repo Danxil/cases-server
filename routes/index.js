@@ -26,7 +26,7 @@ export default ({ app }) => {
   app.get(`${process.env.API_PREFIX}/purchases`, getPurchases());
   app.get(`${process.env.API_PREFIX}/free-kassa/info`, paymentHandler());
   app.get(`${process.env.API_PREFIX}/free-kassa/success`, paymentHandler());
-  app.get(`${process.env.API_PREFIX}/user/:userId/payments`, withdrawHandler());
+  app.get(`${process.env.API_PREFIX}/payments`, withdrawHandler());
   app.get(`${process.env.API_PREFIX}/game-config`, gameConfigHandler());
   app.get(`${process.env.API_PREFIX}/demo-mode-finished-confirmation`, demoModeFinishedConfirmationHandler());
   app.get('/*', (req, res) => {
