@@ -1,4 +1,4 @@
-import { GAME_GAME_SPIN_DELAY } from '../../gameConfig';
+import { GAME_SPIN_DELAY } from '../../gameConfig';
 
 const gameSpinStart = async ({ game, gameCtrl, user, result, ws, db }) => {
   const gameJson = gameCtrl.convertGameToJson(game);
@@ -55,7 +55,7 @@ export default async ({
     updatedUser,
     updatedGame,
   } = await gameSpinStart({ db, game, user, result, gameCtrl, ws });
-  await new Promise(resolve => setTimeout(resolve, GAME_GAME_SPIN_DELAY));
+  await new Promise(resolve => setTimeout(resolve, GAME_SPIN_DELAY));
   await gameSpinDone({
     ws,
     db,

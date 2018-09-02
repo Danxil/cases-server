@@ -7,7 +7,7 @@ import {
   GAME_MIN_CHANCE_TO_WIN,
   GAME_MAX_CHANCE_TO_WIN,
   GAME_MAX_ATTEMPTS,
-  GAME_GAME_SPIN_DELAY,
+  GAME_SPIN_DELAY,
   GAME_MIN_PRIZE,
   GAME_MAX_PRIZE,
 } from '../gameConfig';
@@ -67,7 +67,7 @@ export default (sequelize) => {
   Game.prototype.isGameTimeoutReached = function () {
     if (!this.spinInProgress) return false;
     const now = moment(new Date()).format();
-    const expire = moment(this.lastTouchAt).add(GAME_GAME_SPIN_DELAY * 2, 'ms').format();
+    const expire = moment(this.lastTouchAt).add(GAME_SPIN_DELAY * 2, 'ms').format();
     return now >= expire;
   };
 
@@ -98,7 +98,7 @@ export default (sequelize) => {
     }
     game.risk = getRisk(game);
     const coeficient = (100 - game.chanceToWin) / 100;
-    const lengthLooseItems = Math.round(game.maxAttempts * coeficient);
+    const lengthLooseItems = Math.floor(game.maxAttempts * coeficient);
     const schema = _.shuffle([].concat(
       new Array(lengthLooseItems).fill(0),
       new Array(game.maxAttempts - lengthLooseItems).fill(1),
