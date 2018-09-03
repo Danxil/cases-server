@@ -4,7 +4,9 @@ import { convertGameToJson, findGame, checkBeforeGameAction } from '../../contro
 const gameSpinStart = async ({ game, user, result: clientResult }) => {
   const gameJson = convertGameToJson(game);
   const updateObj = { spinInProgress: true };
-  const result = user.isDemoMode() ? clientResult : game.decryptedSchema[game.getAttemptsAmount()];
+  const result = user.isDemoMode() ?
+    clientResult :
+    !!parseInt(game.decryptedSchema[game.getAttemptsAmount()], 10);
 
   if (result) updateObj.won = game.won + 1;
   else updateObj.lost = game.lost + 1;
