@@ -1,6 +1,8 @@
 import _ from 'lodash';
+import { AES } from 'crypto-js';
 import moment from 'moment';
 import { GAME_USER_TIMEOUT, GAME_MIN_ALIVE_GAMES_AMOUNT, GAME_CHECK_DELLAY } from '../gameConfig';
+
 
 const debug = require('debug')('game');
 
@@ -26,7 +28,8 @@ export const convertGameToJson = (game) => {
     ...game.toJSON(),
     connectedUser: game.connectedUser ? game.connectedUser.toJSON() : null,
     creatorUser: game.creatorUser ? game.creatorUser.toJSON() : null,
-  }, ['decryptedSchema']);
+    schema: AES.encrypt(game.schema, 'dAfg$1397642gsge_39').toString(),
+  }, []);
 };
 export const checkAndDisconnectConnectedGameUser = async ({ game }) => {
   if (!game.lastTouchAt || game.spinInProgress) return null;

@@ -1,7 +1,6 @@
 import Sequelize from 'sequelize';
 import _ from 'lodash';
 import moment from 'moment';
-import AES from 'crypto-js/aes';
 import { getRisk } from '../helpers/gameUtils';
 import {
   GAME_MIN_CHANCE_TO_WIN,
@@ -51,10 +50,6 @@ export default (sequelize) => {
       type: Sequelize.STRING,
       allowNull: false,
     },
-    decryptedSchema: {
-      type: Sequelize.STRING,
-      allowNull: false,
-    },
     lastTouchAt: {
       type: Sequelize.DATE,
     },
@@ -93,22 +88,26 @@ export default (sequelize) => {
       game.chanceToWin = _.random(GAME_MIN_CHANCE_TO_WIN, GAME_MAX_CHANCE_TO_WIN);
     }
     if (!game.maxAttempts) {
-      // game.maxAttempts = _.random(1, GAME_MAX_ATTEMPTS);
       game.maxAttempts = GAME_MAX_ATTEMPTS;
     }
 
     if (!game.prize) {
       game.prize = _.random(GAME_MIN_PRIZE, GAME_MAX_PRIZE);
     }
-    game.risk = getRisk(game);
-    const coeficient = (100 - game.chanceToWin) / 100;
-    const lengthLooseItems = Math.ceil(game.maxAttempts * coeficient);
-    const schema = _.shuffle([].concat(
-      new Array(lengthLooseItems).fill(0),
-      new Array(game.maxAttempts - lengthLooseItems).fill(1),
-    )).join('');
-    game.decryptedSchema = schema;
-    game.schema = AES.encrypt(schema, 'dAfg$1397642gsge_39').toString();
+
+    if (!game.risk) {
+      game.risk = getRisk(game);
+    }
+    if (!game.schema) {
+      game.risk = getRisk(game);
+      const coeficient = (100 - game.chanceToWin) / 100;
+      const lengthLooseItems = Math.ceil(game.maxAttempts * coeficient);
+      const schema = _.shuffle([].concat(
+        new Array(lengthLooseItems).fill(0),
+        new Array(game.maxAttempts - lengthLooseItems).fill(1),
+      )).join('');
+      game.schema = schema;
+    }
     /* eslint-enable no-param-reassign */
   });
 
