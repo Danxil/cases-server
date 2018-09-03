@@ -18,14 +18,14 @@ export default async () => {
   const user = getRandomBot();
   if (!user) return;
 
-  const { id: gameId, chanceToWin, prize, risk } = _.sample(gamesNotInProgress);
+  const { id: gameId, chanceToWin } = _.sample(gamesNotInProgress);
   await gameUserConnect({
     user,
     payload: { gameId },
   });
   const result = Math.random() >= chanceToWin / 100;
   await gameSpin({
-    payload: { gameId, result: result ? prize : -risk },
+    payload: { gameId, result },
     user,
     botMode: true,
   });

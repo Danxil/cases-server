@@ -6,14 +6,14 @@ const gameSpinStart = async ({ game, user, result: clientResult }) => {
   const updateObj = { spinInProgress: true };
   const result = user.isDemoMode() ? clientResult : game.decryptedSchema[game.getAttemptsAmount()];
 
-  if (result > 0) updateObj.won = game.won + 1;
+  if (result) updateObj.won = game.won + 1;
   else updateObj.lost = game.lost + 1;
 
   const { updatedGame, updatedUser } = await global.db.sequelize
   .transaction(async (transaction) => {
     const uGame = await game.update(updateObj, { transaction });
     const uUser = await user.update(
-      { balance: user.balance += result },
+      { balance: user.balance += result ? game.prize : -game.risk },
       { transaction },
     );
     return { updatedGame: uGame, updatedUser: uUser };
@@ -32,7 +32,7 @@ const gameSpinDone = async ({
   const { creatorUser } = game;
   const updatedGame = await game.update({ spinInProgress: false, lastTouchAt: new Date() });
   global.ws.send('*', 'GAME_UPDATED', { game: convertGameToJson(updatedGame), reason: 'GAME_SPIN_DONE', result });
-  if (creatorUser && result < 0) {
+  if (creatorUser && !result) {
     const updatedCreatorUser = await creatorUser.update({
       balance: creatorUser.balance + game.prize + game.risk,
     });
