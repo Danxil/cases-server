@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import moment from 'moment';
 import { GAME_USER_TIMEOUT, GAME_MIN_ALIVE_GAMES_AMOUNT, GAME_CHECK_DELLAY } from '../gameConfig';
 
@@ -21,11 +22,11 @@ export const getNotExpiredGames = async () => {
   });
 };
 export const convertGameToJson = (game) => {
-  return {
+  return _.omit({
     ...game.toJSON(),
     connectedUser: game.connectedUser ? game.connectedUser.toJSON() : null,
     creatorUser: game.creatorUser ? game.creatorUser.toJSON() : null,
-  };
+  }, ['decryptedSchema']);
 };
 export const checkAndDisconnectConnectedGameUser = async ({ game }) => {
   if (!game.lastTouchAt || game.spinInProgress) return null;

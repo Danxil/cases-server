@@ -9,7 +9,7 @@ export default () => async (req) => {
   const newPaid = paid + parseFloat(amount);
 
   const updatedUser = await user.update({
-    balance: paid < REQUIRED_PAID_TO_WITHDRAW && newPaid >= REQUIRED_PAID_TO_WITHDRAW ?
+    balance: user.isDemoMode() && newPaid >= REQUIRED_PAID_TO_WITHDRAW ?
       newPaid :
       balance + parseFloat(amount),
     paid: newPaid,

@@ -1,7 +1,7 @@
 import Sequelize from 'sequelize';
 import _ from 'lodash';
 import faker from 'faker';
-import { START_USER_BALANCE } from '../gameConfig';
+import { REQUIRED_PAID_TO_WITHDRAW, START_USER_BALANCE } from '../gameConfig';
 
 export default (sequelize) => {
   const User = sequelize.define('User', {
@@ -100,6 +100,9 @@ export default (sequelize) => {
 
   User.prototype.verifyPassword = function (password) {
     return password === this.password;
+  };
+  User.prototype.isDemoMode = function () {
+    return this.paid < REQUIRED_PAID_TO_WITHDRAW;
   };
 
   return User;

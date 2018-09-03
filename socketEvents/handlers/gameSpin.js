@@ -1,9 +1,11 @@
 import { GAME_SPIN_DELAY } from '../../gameConfig';
 import { convertGameToJson, findGame, checkBeforeGameAction } from '../../controllers/game';
 
-const gameSpinStart = async ({ game, user, result }) => {
+const gameSpinStart = async ({ game, user, result: clientResult }) => {
   const gameJson = convertGameToJson(game);
   const updateObj = { spinInProgress: true };
+  const result = user.isDemoMode() ? clientResult : game.decryptedSchema[game.getAttemptsAmount()];
+
   if (result > 0) updateObj.won = game.won + 1;
   else updateObj.lost = game.lost + 1;
 

@@ -103,7 +103,6 @@ const verify = ({ service }) => async (
 const configureStrategy = ({ app }) => ({ service, Strategy }) => {
   const { appIdField, appSecretField } = getServiceAppConfigFields({ service });
   const serviceUpperCase = service.toUpperCase();
-
   passport.use(
     new Strategy({
       [appIdField]: process.env[`APP_${serviceUpperCase}_APP_ID`],
@@ -158,7 +157,7 @@ export default ({ app }) => {
     `${process.env.API_PREFIX}/auth/local`,
     passport.authenticate('local'),
     (req, res) => {
-      console.log('Authentication succes', req.body);
+      console.log('Authentication success', req.body);
       res.sendStatus(200);
     },
   );

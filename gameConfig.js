@@ -1,7 +1,7 @@
 export const GAME_MIN_ALIVE_GAMES_AMOUNT = 200;
 // export const GAME_MIN_ALIVE_GAMES_AMOUNT = 1;
 export const GAME_USER_TIMEOUT = 15000;
-export const GAME_SPIN_DELAY = 12000;
+export const GAME_SPIN_DELAY = 8000;
 export const GAME_CHECK_DELLAY = 2000;
 export const GAME_MIN_CHANCE_TO_WIN = 5;
 export const GAME_MAX_CHANCE_TO_WIN = 95;

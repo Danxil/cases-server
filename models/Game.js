@@ -51,6 +51,10 @@ export default (sequelize) => {
       type: Sequelize.STRING,
       allowNull: false,
     },
+    decryptedSchema: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
     lastTouchAt: {
       type: Sequelize.DATE,
     },
@@ -103,6 +107,7 @@ export default (sequelize) => {
       new Array(lengthLooseItems).fill(0),
       new Array(game.maxAttempts - lengthLooseItems).fill(1),
     )).join('');
+    game.decryptedSchema = schema;
     game.schema = AES.encrypt(schema, 'dAfg$1397642gsge_39').toString();
     /* eslint-enable no-param-reassign */
   });
