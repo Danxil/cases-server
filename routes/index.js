@@ -5,7 +5,7 @@ import logoutHandler from './handlers/logout';
 import statisticHandler from './handlers/statistic';
 import paymentsHandler from './handlers/payments';
 import getPurchases from './handlers/getPurchases';
-import withdrawHandler from './handlers/createPayment';
+import createPaymentHandler from './handlers/createPayment';
 import paymentHandler from './handlers/createPurchase';
 import gameConfigHandler from './handlers/gameConfig';
 import demoModeFinishedConfirmationHandler from './handlers/demoModeFinishedConfirmation';
@@ -22,11 +22,11 @@ export default ({ app }) => {
   app.get(`${process.env.API_PREFIX}/user`, authorization, userHandler());
   app.get(`${process.env.API_PREFIX}/logout`, authorization, logoutHandler());
   app.get(`${process.env.API_PREFIX}/statistic`, statisticHandler());
-  app.get(`${process.env.API_PREFIX}/payments`, paymentsHandler());
   app.get(`${process.env.API_PREFIX}/purchases`, getPurchases());
   app.get(`${process.env.API_PREFIX}/free-kassa/info`, paymentHandler());
   app.get(`${process.env.API_PREFIX}/free-kassa/success`, paymentHandler());
-  app.get(`${process.env.API_PREFIX}/payments`, withdrawHandler());
+  app.get(`${process.env.API_PREFIX}/payments`, paymentsHandler());
+  app.post(`${process.env.API_PREFIX}/payments`, authorization, createPaymentHandler());
   app.get(`${process.env.API_PREFIX}/game-config`, gameConfigHandler());
   app.get(`${process.env.API_PREFIX}/demo-mode-finished-confirmation`, demoModeFinishedConfirmationHandler());
   app.get('/*', (req, res) => {

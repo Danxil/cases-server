@@ -1,4 +1,4 @@
-import { checkAndDisconnectConnectedGameUsers } from '../../controllers/game'
+import { checkAndDisconnectConnectedGameUsers } from '../../controllers/game';
 
 export default async () => {
   const {

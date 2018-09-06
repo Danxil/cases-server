@@ -1,10 +1,13 @@
-import { START_USER_BALANCE } from '../../gameConfig';
+import { REQUIRED_PAID_TO_WITHDRAW } from '../../gameConfig';
 import { createPayment } from '../../controllers/payments';
 
 export default () => async (req, res) => {
   const { amount } = req.body;
-  const { balance, id: userId } = req.user;
-  if (balance - amount < START_USER_BALANCE) {
+  const { balance, id: userId, paid } = req.user;
+  if (paid < REQUIRED_PAID_TO_WITHDRAW) {
+    return res.status(400).send('Paid not enough');
+  }
+  if (balance - amount < 0) {
     return res.status(400).send('Not enough balance');
   }
   const updatedUser = await req.user.update({ balance: balance - amount });
