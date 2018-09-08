@@ -11,6 +11,10 @@ export default (sequelize) => {
       type: Sequelize.FLOAT,
       allowNull: false,
     },
+    operationId: {
+      type: Sequelize.string,
+      allowNull: false,
+    },
   }, {
     name: {
       singular: 'purchase',

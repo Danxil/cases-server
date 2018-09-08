@@ -3,8 +3,8 @@ export const getHistory = async ({ filter }) => {
     where: { ...filter },
   });
   return history;
-}
-export const createPurchase = async ({ amount, userId, status }) => {
-  const payment = await global.db.Purchase.create({ amount, userId, status });
+};
+export const createPurchase = async ({ amount, userId, status, transaction }) => {
+  const payment = await global.db.Purchase.create({ amount, userId, status }, { transaction });
   return payment;
-}
+};
