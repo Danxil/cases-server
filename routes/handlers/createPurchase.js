@@ -2,7 +2,7 @@ import { createPurchase } from '../../controllers/purchases';
 import { REQUIRED_PAID_TO_WITHDRAW } from '../../gameConfig';
 
 export default () => async (req) => {
-  const { AMOUNT: amount, us_userId, intid } = req.query;
+  const { AMOUNT: amount, us_userId, intid = 'test' } = req.query;
   const user = await global.db.User.findOne({ where: { id: us_userId } });
   const { balance, paid, id: userId } = user;
 
