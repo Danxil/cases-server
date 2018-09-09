@@ -12,7 +12,7 @@ export default (sequelize) => {
       allowNull: false,
     },
     operationId: {
-      type: Sequelize.string,
+      type: Sequelize.STRING,
       allowNull: false,
     },
   }, {
