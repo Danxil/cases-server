@@ -9,6 +9,7 @@ import createPaymentHandler from './handlers/createPayment';
 import paymentHandler from './handlers/createPurchase';
 import gameConfigHandler from './handlers/gameConfig';
 import demoModeFinishedConfirmationHandler from './handlers/demoModeFinishedConfirmation';
+import demoModeActivatedConfirmationHandler from './handlers/demoModeActivatedConfirmation';
 
 const authorization = (req, res, next) => {
   if (!req.isAuthenticated()) {
@@ -29,6 +30,7 @@ export default ({ app }) => {
   app.post(`${process.env.API_PREFIX}/payments`, authorization, createPaymentHandler());
   app.get(`${process.env.API_PREFIX}/game-config`, gameConfigHandler());
   app.get(`${process.env.API_PREFIX}/demo-mode-finished-confirmation`, demoModeFinishedConfirmationHandler());
+  app.get(`${process.env.API_PREFIX}/demo-mode-activated-confirmation`, demoModeActivatedConfirmationHandler());
   app.get('/*', (req, res) => {
     res.sendFile(path.join(__dirname, '../', 'client', 'index.html'));
   });

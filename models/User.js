@@ -78,6 +78,11 @@ export default (sequelize) => {
       defaultValue: false,
       allowNull: false,
     },
+    demoModeActivatedConfirmation: {
+      type: Sequelize.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
   }, {
     name: {
       singular: 'user',
