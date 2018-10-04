@@ -1,7 +1,7 @@
 import Sequelize from 'sequelize';
 import _ from 'lodash';
 import faker from 'faker';
-import { REQUIRED_PAID_TO_WITHDRAW, START_USER_BALANCE } from '../gameConfig';
+import { REQUIRED_PAID_TO_WITHDRAW, START_USER_BALANCE, GAME_MAX_PRIZE } from '../gameConfig';
 
 export default (sequelize) => {
   const User = sequelize.define('User', {
@@ -99,7 +99,7 @@ export default (sequelize) => {
       const card = faker.helpers.contextualCard();
       user.photo = card.avatar;
       user.displayName = `${card.name} ${faker.name.lastName()}`;
-      user.balance = _.random(1000, 5000);
+      user.balance = _.random(START_USER_BALANCE, GAME_MAX_PRIZE);
     }
   });
 

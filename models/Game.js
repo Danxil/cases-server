@@ -16,7 +16,7 @@ require('dotenv').config();
 export default (sequelize) => {
   const Game = sequelize.define('Game', {
     prize: {
-      type: Sequelize.INTEGER,
+      type: Sequelize.FLOAT,
       allowNull: false,
     },
     chanceToWin: {
@@ -101,7 +101,7 @@ export default (sequelize) => {
     if (!game.schema) {
       game.risk = getRisk(game);
       const coeficient = (100 - game.chanceToWin) / 100;
-      const lengthLooseItems = Math.ceil(game.maxAttempts * coeficient);
+      const lengthLooseItems = Math.round(game.maxAttempts * coeficient);
       const schema = _.shuffle([].concat(
         new Array(lengthLooseItems).fill(0),
         new Array(game.maxAttempts - lengthLooseItems).fill(1),

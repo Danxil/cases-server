@@ -1,5 +1,5 @@
 import { createPurchase } from '../../controllers/purchases';
-import { REQUIRED_PAID_TO_WITHDRAW } from '../../gameConfig';
+import { COINS_RATE } from '../../gameConfig';
 
 export default () => async (req) => {
   const { AMOUNT: amount, us_userId, intid = 'test' } = req.query;
@@ -11,9 +11,7 @@ export default () => async (req) => {
   const { updatedUser } = await global.db.sequelize
   .transaction(async (transaction) => {
     const updatedUserObj = await user.update({
-      balance: user.isDemoMode() && newPaid >= REQUIRED_PAID_TO_WITHDRAW ?
-        newPaid :
-        balance + parseFloat(amount),
+      balance: balance + parseFloat(amount / COINS_RATE),
       paid: newPaid,
     }, { transaction });
     await createPurchase({

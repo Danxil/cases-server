@@ -1,7 +1,13 @@
 import _ from 'lodash';
 import { AES } from 'crypto-js';
 import moment from 'moment';
-import { GAME_USER_TIMEOUT, GAME_MIN_ALIVE_GAMES_AMOUNT, GAME_CHECK_DELLAY } from '../gameConfig';
+import {
+  GAME_USER_TIMEOUT,
+  GAME_MIN_ALIVE_GAMES_AMOUNT,
+  GAME_CHECK_DELLAY,
+  LOW_LEVEL_GAME_PRIZE_TRESHOLD,
+  LOW_LEVEL_GAMES_MIN_AMOUNT,
+} from '../gameConfig';
 
 
 const debug = require('debug')('game');
@@ -108,20 +114,33 @@ export const checkAndExpireNotExpiredGames = async () => {
   .filter(o => o);
   const expiredGamesIds = expiredGames.map(o => o.expiredGame.id);
 
-  const gamesToCreateAmount = GAME_MIN_ALIVE_GAMES_AMOUNT -
-  (notExpiredGames.length -
-  expiredGamesIds.length);
-
   const usersToUpdate = results
   .filter(o => o.userToUpdate)
   .map(o => o.userToUpdate);
 
-  const arr = new Array(gamesToCreateAmount >= 0 ? gamesToCreateAmount : 0).fill();
-  const createdGames = await Promise.all(arr.map(() => createGame()));
+  const newNotExpiredGames = notExpiredGames
+  .filter(notExpiredGame => !expiredGamesIds.find(id => notExpiredGame.id === id));
+  const lowLevelGames = newNotExpiredGames
+  .filter(notExpiredGame => notExpiredGame.prize <= LOW_LEVEL_GAME_PRIZE_TRESHOLD);
+
+  const regularGamesToCreateAmount = GAME_MIN_ALIVE_GAMES_AMOUNT - newNotExpiredGames.length;
+  const lowLevelGamesToCreateAmount = LOW_LEVEL_GAMES_MIN_AMOUNT - lowLevelGames.length;
+
+  const regularGamesToCreateArr = new Array(
+    regularGamesToCreateAmount >= 0 ? regularGamesToCreateAmount : 0,
+  ).fill();
+  const lowLevelGamesToCreateArr = new Array(
+    lowLevelGamesToCreateAmount >= 0 ? lowLevelGamesToCreateAmount : 0,
+  ).fill();
+  const createdRegularGames = await Promise.all(regularGamesToCreateArr.map(() => createGame()));
+  const createdLowLevelGames = await Promise.all(
+    lowLevelGamesToCreateArr
+    .map(() => createGame({ defaults: { prize: _.random(1, LOW_LEVEL_GAME_PRIZE_TRESHOLD) } })),
+  );
   return {
     expiredGamesIds,
     notifyUsersCreatorsIdsAboutGameExpired,
-    createdGames,
+    createdGames: [...createdRegularGames, ...createdLowLevelGames],
     usersToUpdate,
   };
 };
