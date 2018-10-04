@@ -22,8 +22,8 @@ export const MIN_CHANCE_TO_WIN = 5;
 export const MAX_CHANCE_TO_WIN = 95;
 export const MIN_PRIZE = 1;
 export const MAX_PRIZE = 1000;
-export const MIN_AMOUNT_OF_PURCHASE = 1;
-export const MAX_AMOUNT_OF_PURCHASE = 500;
+export const MIN_AMOUNT_OF_PURCHASE = REQUIRED_PAID_TO_WITHDRAW;
+export const MAX_AMOUNT_OF_PURCHASE = 100;
 
 export default {
   REQUIRED_PAID_TO_WITHDRAW,
