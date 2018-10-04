@@ -7,17 +7,22 @@ const gameSpinStart = async ({ game, user, result: clientResult }) => {
   const result = user.isDemoMode() ?
     clientResult :
     !!parseInt(game.schema[game.getAttemptsAmount()], 10);
+  const updateUserObject = {
+    balance: user.balance += result ? game.prize : -game.risk,
+  };
 
-  if (result) updateObj.won = game.won + 1;
-  else updateObj.lost = game.lost + 1;
+  if (result) {
+    updateObj.won = game.won + 1;
+    updateUserObject.gamesWon = user.gamesWon + 1;
+  } else {
+    updateObj.lost = game.lost + 1;
+    updateUserObject.gamesLose = user.gamesLose + 1;
+  }
 
   const { updatedGame, updatedUser } = await global.db.sequelize
   .transaction(async (transaction) => {
     const uGame = await game.update(updateObj, { transaction });
-    const uUser = await user.update(
-      { balance: user.balance += result ? game.prize : -game.risk },
-      { transaction },
-    );
+    const uUser = await user.update(updateUserObject, { transaction });
     return { updatedGame: uGame, updatedUser: uUser };
   });
   gameJson.spinInProgress = true;

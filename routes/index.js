@@ -21,6 +21,7 @@ const authorization = (req, res, next) => {
 export default ({ app }) => {
   app.post(`${process.env.API_PREFIX}/sign-up`, signUpHandler());
   app.get(`${process.env.API_PREFIX}/user`, authorization, userHandler());
+  // app.get(`${process.env.API_PREFIX}/users`, authorization, userHandler());
   app.get(`${process.env.API_PREFIX}/logout`, authorization, logoutHandler());
   app.get(`${process.env.API_PREFIX}/statistic`, statisticHandler());
   app.get(`${process.env.API_PREFIX}/purchases`, getPurchases());
