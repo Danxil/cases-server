@@ -23,6 +23,12 @@ export default async () => {
   const db = models(dbConnection);
   db.sequelize = dbConnection;
   await dbConnection.sync();
+
+  const initDataPromises = Object.keys(db).map((modelName) => {
+    return 'initData' in db[modelName] ? db[modelName].initData(db) : null;
+  });
+  await Promise.all(initDataPromises);
+
   console.log('DB sync succes');
   global.db = db;
   return db;

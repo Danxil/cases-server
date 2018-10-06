@@ -3,21 +3,19 @@ import gameSpin from './gameSpin';
 import gameUserConnect from './gameUserConnect';
 import { getRandomBot } from '../../controllers/fakes';
 import { getNotExpiredGames } from '../../controllers/game';
-import { GAME_MIN_ALIVE_GAMES_AMOUNT, LOW_LEVEL_GAMES_MIN_AMOUNT } from '../../gameConfig';
+import { GAMES_IN_TABLE } from '../../gameConfig';
 
-const addBot = async () => {
-  const notExpiredGames = await getNotExpiredGames();
-  const gamesNotInProgress = notExpiredGames.filter(o => !o.connectedUserId);
+const addBotsToTable = async ({ tableGames }) => {
+  const gamesNotInProgress = tableGames.filter(o => !o.connectedUserId);
   const botsAmountToCreate = (
-    Math.round((GAME_MIN_ALIVE_GAMES_AMOUNT + LOW_LEVEL_GAMES_MIN_AMOUNT) / 10)
-  ) - (notExpiredGames.length - gamesNotInProgress.length);
+    Math.round((GAMES_IN_TABLE) / 4)
+  ) - (tableGames.length - gamesNotInProgress.length);
   if (botsAmountToCreate <= 0) return;
   for (let i = 0; i < botsAmountToCreate; i += 1) {
     const user = getRandomBot();
     if (!user) return;
 
-    const { id: gameId, chanceToWin, prize } = _.sample(gamesNotInProgress);
-    console.log('prize', prize);
+    const { id: gameId, chanceToWin } = _.sample(gamesNotInProgress);
     await gameUserConnect({
       user,
       payload: { gameId },
@@ -33,6 +31,16 @@ const addBot = async () => {
       });
     }, _.random(0, 10000));
   }
+};
+
+const addBot = async () => {
+  const notExpiredGames = await getNotExpiredGames();
+  const notExpiredGamesGroupedPerTable = _.groupBy(notExpiredGames, 'tableId');
+  const tables = await global.db.Table.findAll();
+  tables.map(table => addBotsToTable({
+    table,
+    tableGames: notExpiredGamesGroupedPerTable[table.id] || [],
+  }));
 };
 
 export default addBot;

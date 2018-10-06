@@ -1,0 +1,35 @@
+import Sequelize from 'sequelize';
+import { TABLES_AMOUNT, TABLES_STEP, LOW_LEVEL_GAME_PRIZE_TRESHOLD } from '../gameConfig';
+
+export default (sequelize) => {
+  const Table = sequelize.define('Table', {
+    min: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+    },
+    max: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+    },
+  }, {
+    name: {
+      singular: 'table',
+      plural: 'tables',
+    },
+  });
+
+  Table.associate = () => {
+  };
+
+  Table.initData = async (db) => {
+    await db.Table.create({ min: 1, max: LOW_LEVEL_GAME_PRIZE_TRESHOLD });
+    for (let i = 0; i < TABLES_AMOUNT; i += 1) {
+      await db.Table.create({
+        min: i * TABLES_STEP || LOW_LEVEL_GAME_PRIZE_TRESHOLD,
+        max: (i + 1) * TABLES_STEP,
+      });
+    }
+  };
+
+  return Table;
+};

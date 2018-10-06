@@ -80,6 +80,7 @@ export default (sequelize) => {
   Game.associate = (models) => {
     models.Game.belongsTo(models.User, { foreignKey: 'creatorUserId', as: 'creatorUser' });
     models.Game.belongsTo(models.User, { foreignKey: 'connectedUserId', as: 'connectedUser' });
+    models.Game.belongsTo(models.Table, { foreignKey: 'tableId', as: 'table' });
   };
 
   Game.beforeValidate((game) => {

@@ -3,10 +3,8 @@ import { AES } from 'crypto-js';
 import moment from 'moment';
 import {
   GAME_USER_TIMEOUT,
-  GAME_MIN_ALIVE_GAMES_AMOUNT,
+  GAMES_IN_TABLE,
   GAME_CHECK_DELLAY,
-  LOW_LEVEL_GAME_PRIZE_TRESHOLD,
-  LOW_LEVEL_GAMES_MIN_AMOUNT,
 } from '../gameConfig';
 
 
@@ -26,6 +24,7 @@ export const getNotExpiredGames = async () => {
     include: [
       { model: global.db.User, as: 'creatorUser' },
       { model: global.db.User, as: 'connectedUser' },
+      { model: global.db.Table, as: 'table' },
     ],
   });
 };
@@ -101,8 +100,22 @@ export const createGame = async ({ defaults = {} } = {}) => {
   return game;
 };
 
+export const addGamesForTable = ({ tableGames, table }) => {
+  const gamesToCreateAmount = GAMES_IN_TABLE - tableGames.length;
+  const gamesToCreateArr = new Array(gamesToCreateAmount).fill();
+  return Promise.all(
+    gamesToCreateArr.map(() => createGame({
+      defaults: {
+        tableId: table.id,
+        prize: _.random(table.min, table.max),
+      },
+    })),
+  );
+};
+
 export const checkAndExpireNotExpiredGames = async () => {
   const notExpiredGames = await getNotExpiredGames();
+  const tables = await global.db.Table.findAll();
 
   const results = await Promise.all(
     notExpiredGames.map(game => checkAndExpireNotExpiredGame({ game })),
@@ -120,27 +133,19 @@ export const checkAndExpireNotExpiredGames = async () => {
 
   const newNotExpiredGames = notExpiredGames
   .filter(notExpiredGame => !expiredGamesIds.find(id => notExpiredGame.id === id));
-  const lowLevelGames = newNotExpiredGames
-  .filter(notExpiredGame => notExpiredGame.prize <= LOW_LEVEL_GAME_PRIZE_TRESHOLD);
+  const groupedNotExpiredGames = _.groupBy(newNotExpiredGames, 'tableId');
+  const createGamesPerTablePromises = tables.map(table => addGamesForTable({
+    table,
+    tableGames: groupedNotExpiredGames[table.id] || [],
+  }),
+);
 
-  const regularGamesToCreateAmount = GAME_MIN_ALIVE_GAMES_AMOUNT - newNotExpiredGames.length;
-  const lowLevelGamesToCreateAmount = LOW_LEVEL_GAMES_MIN_AMOUNT - lowLevelGames.length;
 
-  const regularGamesToCreateArr = new Array(
-    regularGamesToCreateAmount >= 0 ? regularGamesToCreateAmount : 0,
-  ).fill();
-  const lowLevelGamesToCreateArr = new Array(
-    lowLevelGamesToCreateAmount >= 0 ? lowLevelGamesToCreateAmount : 0,
-  ).fill();
-  const createdRegularGames = await Promise.all(regularGamesToCreateArr.map(() => createGame()));
-  const createdLowLevelGames = await Promise.all(
-    lowLevelGamesToCreateArr
-    .map(() => createGame({ defaults: { prize: _.random(1, LOW_LEVEL_GAME_PRIZE_TRESHOLD) } })),
-  );
+  const createGamesResult = await Promise.all(createGamesPerTablePromises);
   return {
     expiredGamesIds,
     notifyUsersCreatorsIdsAboutGameExpired,
-    createdGames: [...createdRegularGames, ...createdLowLevelGames],
+    createdGames: _.flatten(createGamesResult),
     usersToUpdate,
   };
 };

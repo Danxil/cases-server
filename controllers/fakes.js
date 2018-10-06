@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import moment from 'moment';
-import { MIN_PAYMENTS_TO_SHOW, GAME_MIN_ALIVE_GAMES_AMOUNT } from '../gameConfig';
+import { MIN_PAYMENTS_TO_SHOW, GAMES_IN_TABLE, TABLES_AMOUNT } from '../gameConfig';
 
 let bots = [];
 let payments = [];
@@ -25,7 +25,7 @@ export const getRandomBot = () => _.sample(bots);
 export const getBots = () => bots;
 export const updateBots = async () => {
   await global.db.User.destroy({ where: { bot: true } });
-  bots = await generateBots(Math.round(GAME_MIN_ALIVE_GAMES_AMOUNT / 2));
+  bots = await generateBots(Math.round((GAMES_IN_TABLE * TABLES_AMOUNT) / 2));
 };
 
 export const generatePayment = () => ({
