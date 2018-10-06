@@ -8,17 +8,16 @@ import { GAME_MIN_ALIVE_GAMES_AMOUNT, LOW_LEVEL_GAMES_MIN_AMOUNT } from '../../g
 const addBot = async () => {
   const notExpiredGames = await getNotExpiredGames();
   const gamesNotInProgress = notExpiredGames.filter(o => !o.connectedUserId);
-  console.log('inprogress', notExpiredGames.length - gamesNotInProgress.length);
   const botsAmountToCreate = (
     Math.round((GAME_MIN_ALIVE_GAMES_AMOUNT + LOW_LEVEL_GAMES_MIN_AMOUNT) / 10)
   ) - (notExpiredGames.length - gamesNotInProgress.length);
   if (botsAmountToCreate <= 0) return;
-  console.log('botsAmountToCreate', botsAmountToCreate);
   for (let i = 0; i < botsAmountToCreate; i += 1) {
     const user = getRandomBot();
     if (!user) return;
 
-    const { id: gameId, chanceToWin } = _.sample(gamesNotInProgress);
+    const { id: gameId, chanceToWin, prize } = _.sample(gamesNotInProgress);
+    console.log('prize', prize);
     await gameUserConnect({
       user,
       payload: { gameId },
@@ -34,7 +33,6 @@ const addBot = async () => {
       });
     }, _.random(0, 10000));
   }
-  console.log('DONE');
 };
 
 export default addBot;
