@@ -21,15 +21,16 @@ export default (sequelize) => {
   Table.associate = () => {
   };
 
-  // Table.initData = async (db) => {
-  //   await db.Table.create({ min: 1, max: LOW_LEVEL_GAME_PRIZE_TRESHOLD });
-  //   for (let i = 0; i < TABLES_AMOUNT; i += 1) {
-  //     await db.Table.create({
-  //       min: i * TABLES_STEP || LOW_LEVEL_GAME_PRIZE_TRESHOLD,
-  //       max: (i + 1) * TABLES_STEP,
-  //     });
-  //   }
-  // };
+  Table.initData = async (db) => {
+    const query = { min: 1, max: LOW_LEVEL_GAME_PRIZE_TRESHOLD };
+    await db.Table.findOrCreate({ where: query, defaults: query });
+    for (let i = 0; i < TABLES_AMOUNT; i += 1) {
+      await db.Table.create({
+        min: i * TABLES_STEP || LOW_LEVEL_GAME_PRIZE_TRESHOLD,
+        max: (i + 1) * TABLES_STEP,
+      });
+    }
+  };
 
   return Table;
 };
