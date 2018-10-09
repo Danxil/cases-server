@@ -64,7 +64,7 @@ export default (sequelize) => {
     return this.won + this.lost >= this.maxAttempts;
   };
   Game.prototype.isGameTimeoutReached = function () {
-    if (!this.spinInProgress) return false;
+    if (this.spinInProgress) return false;
     const now = moment(new Date()).format();
     const expire = moment(this.lastTouchAt).add(GAME_SPIN_DELAY * 2, 'ms').format();
     return now >= expire;
