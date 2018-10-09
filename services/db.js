@@ -12,7 +12,7 @@ export default async () => {
       // sync: { force: false },
       logging: str => debug(str),
       pool: {
-        max: 5,
+        max: 1,
         min: 1,
         acquire: 20000,
         evict: 2000,

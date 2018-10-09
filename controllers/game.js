@@ -102,7 +102,7 @@ export const createGame = async ({ defaults = {} } = {}) => {
 
 export const addGamesForTable = ({ tableGames, table }) => {
   const gamesToCreateAmount = GAMES_IN_TABLE - tableGames.length;
-  const gamesToCreateArr = new Array(gamesToCreateAmount).fill();
+  const gamesToCreateArr = new Array(gamesToCreateAmount >= 0 ? gamesToCreateAmount : 0).fill();
   return Promise.all(
     gamesToCreateArr.map(() => createGame({
       defaults: {

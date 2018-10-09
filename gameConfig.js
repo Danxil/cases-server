@@ -23,7 +23,6 @@ export const MIN_AMOUNT_OF_PURCHASE = 500;
 export const MAX_AMOUNT_OF_PURCHASE = 10000;
 export const COINS_RATE = 0.01;
 export const LOW_LEVEL_GAME_PRIZE_TRESHOLD = 50;
-export const LOW_LEVEL_GAMES_MIN_AMOUNT = 20;
 export const TABLES_AMOUNT = 20;
 export const TABLES_STEP = 1000;
 export const GAMES_IN_TABLE = 40;
