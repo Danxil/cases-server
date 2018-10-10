@@ -13,7 +13,6 @@ import configureSchedules from './configs/configureSchedules';
 import configureDb from './services/db';
 import WS from './services/ws';
 import initData from './socketEvents/handlers/initData';
-import { updateFakes } from './controllers/fakes';
 
 require('dotenv').config();
 
@@ -41,7 +40,6 @@ configureDb().then(async (db) => {
     ({ user, ws: wsService }) => initData({ user, ws: wsService }),
   );
 
-  await updateFakes();
   await configureSchedules();
 
   routes({ app });
@@ -63,4 +61,3 @@ process.on('SIGTERM', () => {
     console.log('SIGTERM failed', err);
   });
 });
-

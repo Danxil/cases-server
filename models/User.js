@@ -92,6 +92,7 @@ export default (sequelize) => {
 
   User.associate = (models) => {
     models.User.hasOne(models.Game, { foreignKey: 'creatorUserId', as: 'createdGame' });
+    models.User.hasOne(models.Game, { foreignKey: 'connectedUserId', as: 'connectedGame' });
   };
 
   User.beforeValidate(async (user) => {

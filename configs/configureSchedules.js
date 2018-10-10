@@ -3,17 +3,26 @@ import checkConnectedUsers from '../socketEvents/handlers/checkConnectedUsers';
 import addBot from '../socketEvents/handlers/addBot';
 import { updateFakes } from '../controllers/fakes';
 import {
-  GAME_CHECK_ALIVE_GAMES_INTERVAL,
+  GAME_CHECK_INTERVAL,
   GAME_UPDATE_FAKES_INTERVAL,
 } from '../gameConfig';
+
+let lastUpdateFakes = new Date(0);
 
 const check = async () => {
   try {
     await checkConnectedUsers();
     await checkGames();
     await addBot();
+    if (
+      lastUpdateFakes === null ||
+      new Date().getTime() - lastUpdateFakes.getTime() >= GAME_UPDATE_FAKES_INTERVAL
+    ) {
+      await updateFakes();
+      lastUpdateFakes = new Date();
+    }
 
-    setTimeout(check, GAME_CHECK_ALIVE_GAMES_INTERVAL);
+    setTimeout(check, GAME_CHECK_INTERVAL);
   } catch (e) {
     console.log(e);
   }
@@ -21,14 +30,6 @@ const check = async () => {
 
 export default async () => {
   await check();
-  setInterval(async () => {
-    try {
-      // await updateFakes();
-    } catch (e) {
-      console.log(e);
-    }
-  }, GAME_UPDATE_FAKES_INTERVAL);
-
   setInterval(() => {
     const heapUsed = process.memoryUsage().heapUsed / 1024 / 1024;
     const heapTotal = process.memoryUsage().heapTotal / 1024 / 1024;
