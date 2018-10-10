@@ -37,10 +37,11 @@ const addBot = async () => {
   const notExpiredGames = await getNotExpiredGames();
   const notExpiredGamesGroupedPerTable = _.groupBy(notExpiredGames, 'tableId');
   const tables = await global.db.Table.findAll();
-  tables.map(table => addBotsToTable({
+  const promises = tables.map(table => addBotsToTable({
     table,
     tableGames: notExpiredGamesGroupedPerTable[table.id] || [],
   }));
+  return Promise.all(promises);
 };
 
 export default addBot;
