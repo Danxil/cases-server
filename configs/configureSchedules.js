@@ -4,41 +4,26 @@ import addBot from '../socketEvents/handlers/addBot';
 import { updateFakes } from '../controllers/fakes';
 import {
   GAME_CHECK_ALIVE_GAMES_INTERVAL,
-  GAME_ADD_BOT_INTERVAL,
   GAME_UPDATE_FAKES_INTERVAL,
-  GAME_CHECK_CONNECTED_USERS_INTERVAL,
 } from '../gameConfig';
 
+const check = async () => {
+  try {
+    await checkConnectedUsers();
+    await checkGames();
+    await addBot();
+
+    setTimeout(check, GAME_CHECK_ALIVE_GAMES_INTERVAL);
+  } catch (e) {
+    console.log(e);
+  }
+};
+
 export default async () => {
-  await checkGames();
+  await check();
   setInterval(async () => {
     try {
-      await checkGames();
-    } catch (e) {
-      console.log(e);
-    }
-  }, GAME_CHECK_ALIVE_GAMES_INTERVAL);
-
-  await checkConnectedUsers();
-  setInterval(async () => {
-    try {
-      await checkConnectedUsers();
-    } catch (e) {
-      console.log(e);
-    }
-  }, GAME_CHECK_CONNECTED_USERS_INTERVAL);
-
-  setInterval(async () => {
-    try {
-      await addBot();
-    } catch (e) {
-      console.log(e);
-    }
-  }, GAME_ADD_BOT_INTERVAL);
-
-  setInterval(async () => {
-    try {
-      await updateFakes();
+      // await updateFakes();
     } catch (e) {
       console.log(e);
     }
