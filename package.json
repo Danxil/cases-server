@@ -9,7 +9,7 @@
   "scripts": {
     "lint": "node_modules/.bin/eslint ./**/*.js ./*.js",
     "start": "./node_modules/.bin/babel-node index.js",
-    "start-dev": "node_modules/.bin/nodemon index.js --inspect --exec ./node_modules/.bin/babel-node index.js",
+    "start-dev": "node -r dotenv/config node_modules/.bin/nodemon index.js --inspect --exec ./node_modules/.bin/babel-node index.js",
     "test-data": "node_modules/.bin/eslint ./**/*.js ./*.js && ./node_modules/babel-cli/bin/babel-node.js test-data.js",
     "test": "node_modules/.bin/eslint ./**/*.js ./*.js && node_modules/.bin/nodemon -w __tests__ -w ./ -e js,jsx --exec node_modules/.bin/jest"
   },

@@ -83,6 +83,11 @@ export default (sequelize) => {
       defaultValue: false,
       allowNull: false,
     },
+    isAdmin: {
+      type: Sequelize.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
   }, {
     name: {
       singular: 'user',
@@ -93,6 +98,15 @@ export default (sequelize) => {
   User.associate = (models) => {
     models.User.hasOne(models.Game, { foreignKey: 'creatorUserId', as: 'createdGame' });
     models.User.hasOne(models.Game, { foreignKey: 'connectedUserId', as: 'connectedGame' });
+  };
+
+  User.initData = async (db) => {
+    const query = {
+      isAdmin: true,
+      email: 'admin@admin.admin',
+      password: 'admin666',
+    };
+    await db.User.findOrCreate({ where: query, defaults: query });
   };
 
   User.beforeValidate(async (user) => {

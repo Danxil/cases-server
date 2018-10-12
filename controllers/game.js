@@ -7,7 +7,6 @@ import {
   GAME_CHECK_DELLAY,
 } from '../gameConfig';
 
-
 const debug = require('debug')('game');
 
 export const findGame = async ({ gameId }) => {

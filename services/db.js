@@ -1,7 +1,6 @@
 import Sequelize from 'sequelize';
 import models from '../models';
 
-require('dotenv').config();
 const debug = require('debug')('sequelize');
 
 export default async () => {

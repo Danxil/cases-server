@@ -11,6 +11,7 @@ import gameConfigHandler from './handlers/gameConfig';
 import demoModeFinishedConfirmationHandler from './handlers/demoModeFinishedConfirmation';
 import demoModeActivatedConfirmationHandler from './handlers/demoModeActivatedConfirmation';
 import getTablesHandler from './handlers/getTables';
+import getAdminStatistic from './handlers/getAdminStatistic';
 
 const authorization = (req, res, next) => {
   if (!req.isAuthenticated()) {
@@ -34,6 +35,7 @@ export default ({ app }) => {
   app.get(`${process.env.API_PREFIX}/demo-mode-finished-confirmation`, demoModeFinishedConfirmationHandler());
   app.get(`${process.env.API_PREFIX}/demo-mode-activated-confirmation`, demoModeActivatedConfirmationHandler());
   app.get(`${process.env.API_PREFIX}/tables`, getTablesHandler());
+  app.get(`${process.env.API_PREFIX}/admin-statistic`, getAdminStatistic());
   app.get('/*', (req, res) => {
     res.sendFile(path.join(__dirname, '../', 'client', 'index.html'));
   });

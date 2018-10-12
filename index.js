@@ -14,8 +14,6 @@ import configureDb from './services/db';
 import WS from './services/ws';
 import initData from './socketEvents/handlers/initData';
 
-require('dotenv').config();
-
 const app = express();
 if (process.env.NODE_ENV === 'production') app.use(expressSslify.HTTPS({ trustProtoHeader: true }));
 

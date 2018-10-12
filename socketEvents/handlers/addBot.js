@@ -11,6 +11,7 @@ const addBotsToTable = async ({ tableGames }) => {
     Math.round((GAMES_IN_TABLE) / 4)
   ) - (tableGames.length - gamesNotInProgress.length);
   if (botsAmountToCreate <= 0) return;
+
   for (let i = 0; i < botsAmountToCreate; i += 1) {
     const user = getRandomBot();
     if (!user) return;

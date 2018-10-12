@@ -11,8 +11,6 @@ import {
   GAME_MAX_PRIZE,
 } from '../gameConfig';
 
-require('dotenv').config();
-
 export default (sequelize) => {
   const Game = sequelize.define('Game', {
     prize: {
