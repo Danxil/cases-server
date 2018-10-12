@@ -1,7 +1,6 @@
 import Sequelize from 'sequelize';
-import _ from 'lodash';
 import faker from 'faker';
-import { REQUIRED_PAID_TO_WITHDRAW, START_USER_BALANCE, GAME_MAX_PRIZE } from '../gameConfig';
+import { REQUIRED_PAID_TO_WITHDRAW, START_USER_BALANCE, START_BOT_BALANCE } from '../gameConfig';
 
 export default (sequelize) => {
   const User = sequelize.define('User', {
@@ -114,6 +113,7 @@ export default (sequelize) => {
       const card = faker.helpers.contextualCard();
       user.photo = card.avatar;
       user.displayName = `${card.name} ${faker.name.lastName()}`;
+      user.balance = START_BOT_BALANCE;
     }
   });
 
