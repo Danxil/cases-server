@@ -1,10 +1,10 @@
 import _ from 'lodash';
 import moment from 'moment';
 import { Op } from 'sequelize';
-import { MIN_PAYMENTS_TO_SHOW, GAMES_IN_TABLE, TABLES_AMOUNT } from '../gameConfig';
+import { MIN_WITHDRAWS_TO_SHOW, GAMES_IN_TABLE, TABLES_AMOUNT } from '../gameConfig';
 
 let bots = [];
-let payments = [];
+let withdraws = [];
 const randomDate = (start, end) => {
   return new Date(
     start.valueOf() + (Math.random() * (end.valueOf() - start.valueOf())),
@@ -53,20 +53,20 @@ export const updateBots = async () => {
   bots = [...remainedBots, ...newBots];
 };
 
-export const generatePayment = () => ({
+export const generateWithdraw = () => ({
   amount: _.random(0, 300),
   status: 'done',
   user: getRandomBot(),
   createdAt: randomDate(moment().add(-1, 'days'), moment()),
 });
-export const updatePayments = () => {
-  payments = new Array(MIN_PAYMENTS_TO_SHOW).fill()
-  .map(() => generatePayment());
+export const updateWithdraws = () => {
+  withdraws = new Array(MIN_WITHDRAWS_TO_SHOW).fill()
+  .map(() => generateWithdraw());
 };
-export const getRandomPayment = () => _.sample(payments);
-export const getPayments = () => payments;
+export const getRandomWithdraws = () => _.sample(withdraws);
+export const getWithdraws = () => withdraws;
 
 export const updateFakes = async () => {
   await updateBots();
-  updatePayments();
+  updateWithdraws();
 };

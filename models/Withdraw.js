@@ -1,7 +1,7 @@
 import Sequelize from 'sequelize';
 
 export default (sequelize) => {
-  const Payment = sequelize.define('Payment', {
+  const Withdraw = sequelize.define('Withdraw', {
     status: {
       type: Sequelize.STRING,
       allowNull: false,
@@ -13,14 +13,14 @@ export default (sequelize) => {
     },
   }, {
     name: {
-      singular: 'payment',
-      plural: 'payments',
+      singular: 'withdraw',
+      plural: 'withdraws',
     },
   });
 
-  Payment.associate = (models) => {
-    models.Payment.belongsTo(models.User, { foreignKey: 'userId' });
+  Withdraw.associate = (models) => {
+    models.Withdraw.belongsTo(models.User, { foreignKey: 'userId' });
   };
 
-  return Payment;
+  return Withdraw;
 };

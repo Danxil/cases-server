@@ -79,7 +79,6 @@ export default class WS {
   }
 
   on(action, cb) {
-    console.log()
     this.callbacks[`on${action.charAt(0).toUpperCase() + action.slice(1)}`] = cb;
     return this;
   }

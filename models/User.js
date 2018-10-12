@@ -114,7 +114,6 @@ export default (sequelize) => {
       const card = faker.helpers.contextualCard();
       user.photo = card.avatar;
       user.displayName = `${card.name} ${faker.name.lastName()}`;
-      user.balance = _.random(START_USER_BALANCE, GAME_MAX_PRIZE);
     }
   });
 

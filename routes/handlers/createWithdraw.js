@@ -1,4 +1,4 @@
-import { createPayment } from '../../controllers/payments';
+import { createWithdraw } from '../../controllers/withdraws';
 import { COINS_RATE } from '../../gameConfig';
 
 export default () => async (req, res) => {
@@ -8,10 +8,10 @@ export default () => async (req, res) => {
     return res.status(400).send('Not enough balance');
   }
   const updatedUser = await req.user.update({ balance: balance - amount });
-  const payment = await createPayment({
+  const withdraw = await createWithdraw({
     amount: amount * COINS_RATE,
     userId,
   });
   global.ws.send(req.user.id, 'USER_UPDATED', updatedUser);
-  return res.status(200).send({ ...payment.toJSON(), user: req.user });
+  return res.status(200).send({ ...withdraw.toJSON(), user: req.user });
 };
