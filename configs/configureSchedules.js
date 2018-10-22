@@ -4,7 +4,7 @@ import addBot from '../socketEvents/handlers/addBot';
 import { updateFakes } from '../controllers/fakes';
 import {
   GAME_CHECK_INTERVAL,
-  GAME_UPDATE_FAKES_INTERVAL,
+  // GAME_UPDATE_FAKES_INTERVAL,
 } from '../gameConfig';
 
 let lastUpdateFakes = new Date(0);

@@ -1,6 +1,6 @@
 import Sequelize from 'sequelize';
 import faker from 'faker';
-import { REQUIRED_PAID_TO_WITHDRAW, START_USER_BALANCE, START_BOT_BALANCE } from '../gameConfig';
+import { MIN_AMOUNT_OF_WITHDRAWING, START_USER_BALANCE, START_BOT_BALANCE } from '../gameConfig';
 
 export default (sequelize) => {
   const User = sequelize.define('User', {
@@ -52,6 +52,12 @@ export default (sequelize) => {
       type: Sequelize.FLOAT,
       defaultValue: START_USER_BALANCE,
       allowNull: false,
+      set(value) {
+        if (value >= MIN_AMOUNT_OF_WITHDRAWING) {
+          this.setDataValue('wasAbleToWithdraw', true);
+        }
+        this.setDataValue('balance', value);
+      },
     },
     paid: {
       type: Sequelize.FLOAT,
@@ -83,6 +89,11 @@ export default (sequelize) => {
       allowNull: false,
     },
     isAdmin: {
+      type: Sequelize.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
+    wasAbleToWithdraw: {
       type: Sequelize.BOOLEAN,
       defaultValue: false,
       allowNull: false,
@@ -119,9 +130,6 @@ export default (sequelize) => {
 
   User.prototype.verifyPassword = function (password) {
     return password === this.password;
-  };
-  User.prototype.isDemoMode = function () {
-    return this.paid < REQUIRED_PAID_TO_WITHDRAW;
   };
 
   return User;

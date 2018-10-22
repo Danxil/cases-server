@@ -20,6 +20,13 @@ const authorization = (req, res, next) => {
   return next();
 };
 
+const isAdmin = (req, res, next) => {
+  if (!req.user.isAdmin) {
+    return res.send(403);
+  }
+  return next();
+};
+
 export default ({ app }) => {
   app.post(`${process.env.API_PREFIX}/sign-up`, signUpHandler());
   app.get(`${process.env.API_PREFIX}/user`, authorization, userHandler());
@@ -35,7 +42,7 @@ export default ({ app }) => {
   app.get(`${process.env.API_PREFIX}/demo-mode-finished-confirmation`, demoModeFinishedConfirmationHandler());
   app.get(`${process.env.API_PREFIX}/demo-mode-activated-confirmation`, demoModeActivatedConfirmationHandler());
   app.get(`${process.env.API_PREFIX}/tables`, getTablesHandler());
-  app.get(`${process.env.API_PREFIX}/admin-statistic`, getAdminStatistic());
+  app.get(`${process.env.API_PREFIX}/admin-statistic`, authorization, isAdmin, getAdminStatistic());
   app.get('/*', (req, res) => {
     res.sendFile(path.join(__dirname, '../', 'client', 'index.html'));
   });

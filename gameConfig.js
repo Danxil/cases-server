@@ -12,6 +12,7 @@ export const GAME_CHECK_INTERVAL = 2000;
 export const MIN_WITHDRAWS_TO_SHOW = 20;
 export const START_USER_BALANCE = 50;
 export const START_BOT_BALANCE = GAME_MAX_PRIZE / 2;
+// export const START_BOT_BALANCE = START_USER_BALANCE;
 export const REQUIRED_PAID_TO_WITHDRAW = 5;
 export const MIN_AMOUNT_OF_WITHDRAWING = 1000;
 export const GAMES_AMOUNT = 200;

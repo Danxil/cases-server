@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import gameSpin from './gameSpin';
 import gameUserConnect from './gameUserConnect';
-import { getRandomBot } from '../../controllers/fakes';
+import { getBots } from '../../controllers/fakes';
 import { getNotExpiredGames } from '../../controllers/game';
 import { GAMES_IN_TABLE } from '../../gameConfig';
 
@@ -13,10 +13,9 @@ const addBotsToTable = async ({ tableGames }) => {
   if (botsAmountToCreate <= 0) return;
 
   for (let i = 0; i < botsAmountToCreate; i += 1) {
-    const user = getRandomBot();
+    const { id: gameId, chanceToWin, risk } = _.sample(gamesNotInProgress);
+    const user = _.sample(getBots().filter(o => o.balance >= risk));
     if (!user) return;
-
-    const { id: gameId, chanceToWin } = _.sample(gamesNotInProgress);
     await gameUserConnect({
       user,
       payload: { gameId },

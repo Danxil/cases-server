@@ -1,11 +1,28 @@
 import { getNotExpiredGames } from '../../controllers/game';
 import { getBots } from '../../controllers/fakes';
-import { START_USER_BALANCE, START_BOT_BALANCE } from '../../gameConfig';
+import { START_USER_BALANCE, START_BOT_BALANCE, MIN_AMOUNT_OF_WITHDRAWING } from '../../gameConfig';
 
 const getUsersStatistic = async ({ forBots = false }) => {
   const usersOptions = { where: { bot: forBots, isAdmin: false } };
   const users = await global.db.User.findAll(usersOptions);
   const withdraws = await global.db.Withdraw.findAll();
+
+  const usersCanWithdrawWithoutPayments = users
+    .filter(o => o.paid === 0 && o.balance >= MIN_AMOUNT_OF_WITHDRAWING).length;
+  const usersCanWithdrawWithPayments = users
+    .filter(o => o.paid > 0 && o.balance >= MIN_AMOUNT_OF_WITHDRAWING).length;
+  const usersWasAbleToWithdrawWithoutPayments = users
+    .filter(o => (
+      o.paid === 0 &&
+      o.balance < MIN_AMOUNT_OF_WITHDRAWING &&
+      o.wasAbleToWithdraw
+    )).length;
+  const usersWasAbleToWithdrawWithPayments = users
+    .filter(o => (
+      o.paid > 0 &&
+      o.balance < MIN_AMOUNT_OF_WITHDRAWING &&
+      o.wasAbleToWithdraw
+    )).length;
   const totalWithdraws = withdraws.reduce((prev, o) => o.amount + prev, 0);
   const totalBalanceForAllTime = users
     .reduce((prev, o) => o.balance + prev, 0) + totalWithdraws;
@@ -24,6 +41,10 @@ const getUsersStatistic = async ({ forBots = false }) => {
     profit,
     bonusesIssued,
     usersWon,
+    usersCanWithdrawWithoutPayments,
+    usersCanWithdrawWithPayments,
+    usersWasAbleToWithdrawWithoutPayments,
+    usersWasAbleToWithdrawWithPayments,
   };
 };
 
@@ -55,6 +76,22 @@ export default () => async (req, res) => {
             value: realUsersStatistic.usersWon.toFixed(),
           },
           {
+            label: 'Users can withdraw without payments',
+            value: realUsersStatistic.usersCanWithdrawWithoutPayments.toFixed(),
+          },
+          {
+            label: 'Users can withdraw with payments',
+            value: realUsersStatistic.usersCanWithdrawWithPayments.toFixed(),
+          },
+          {
+            label: 'Users was able to withdraw without payments',
+            value: realUsersStatistic.usersWasAbleToWithdrawWithoutPayments.toFixed(),
+          },
+          {
+            label: 'Users was able to withdraw with payments',
+            value: realUsersStatistic.usersWasAbleToWithdrawWithPayments.toFixed(),
+          },
+          {
             label: 'Bonuses issued',
             value: realUsersStatistic.bonusesIssued.toFixed(),
           },
@@ -80,6 +117,22 @@ export default () => async (req, res) => {
             value: botsStatistic.usersWon.toFixed(),
           },
           {
+            label: 'Users which can withdraw without payments',
+            value: botsStatistic.usersCanWithdrawWithoutPayments.toFixed(),
+          },
+          {
+            label: 'Users which can withdraw with payments',
+            value: botsStatistic.usersCanWithdrawWithPayments.toFixed(),
+          },
+          {
+            label: 'Users was able to withdraw without payments',
+            value: botsStatistic.usersWasAbleToWithdrawWithoutPayments.toFixed(),
+          },
+          {
+            label: 'Users was able to withdraw with payments',
+            value: botsStatistic.usersWasAbleToWithdrawWithPayments.toFixed(),
+          },
+          {
             label: 'Bonuses issued',
             value: botsStatistic.bonusesIssued.toFixed(),
           },
@@ -95,6 +148,10 @@ export default () => async (req, res) => {
           {
             label: 'Bots created',
             value: getBots().length,
+          },
+          {
+            label: 'Games created',
+            value: notExpiredGames.length,
           },
           {
             label: 'Games in progress',
@@ -113,6 +170,10 @@ export default () => async (req, res) => {
             fields: tables.map(table => ({
               label: `tableId: ${table.id}, min: ${table.min}, max: ${table.max}`,
               fields: [
+                {
+                  label: 'Games created',
+                  value: notExpiredGames.filter(game => game.tableId === table.id).length,
+                },
                 {
                   label: 'Games in progress',
                   value: gamesInProgress.filter(game => game.tableId === table.id).length,
