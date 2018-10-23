@@ -1,5 +1,4 @@
 import { getNotExpiredGames } from '../../controllers/game';
-import { getBots } from '../../controllers/fakes';
 import { START_USER_BALANCE, START_BOT_BALANCE, MIN_AMOUNT_OF_WITHDRAWING } from '../../gameConfig';
 
 const getUsersStatistic = async ({ forBots = false }) => {
@@ -36,6 +35,7 @@ const getUsersStatistic = async ({ forBots = false }) => {
   }
   const usersWon = totalBalanceForAllTime - bonusesIssued;
   return {
+    users: users.length,
     totalBalanceForAllTime,
     totalPaid,
     profit,
@@ -46,6 +46,55 @@ const getUsersStatistic = async ({ forBots = false }) => {
     usersWasAbleToWithdrawWithoutPayments,
     usersWasAbleToWithdrawWithPayments,
   };
+};
+
+const getUsersFileds = ({ source, gamesInProgress }) => {
+  return [
+    {
+      label: 'Users',
+      value: source.users,
+    },
+    {
+      label: 'Users in progress',
+      value: gamesInProgress,
+    },
+    {
+      label: 'Profit',
+      value: source.profit.toFixed(),
+    },
+    {
+      label: 'Users paid',
+      value: source.totalPaid.toFixed(),
+    },
+    {
+      label: 'Users won',
+      value: source.usersWon.toFixed(),
+    },
+    {
+      label: 'Users can withdraw without payments',
+      value: source.usersCanWithdrawWithoutPayments.toFixed(),
+    },
+    {
+      label: 'Users can withdraw with payments',
+      value: source.usersCanWithdrawWithPayments.toFixed(),
+    },
+    {
+      label: 'Users was able to withdraw without payments',
+      value: source.usersWasAbleToWithdrawWithoutPayments.toFixed(),
+    },
+    {
+      label: 'Users was able to withdraw with payments',
+      value: source.usersWasAbleToWithdrawWithPayments.toFixed(),
+    },
+    {
+      label: 'Bonuses issued',
+      value: source.bonusesIssued.toFixed(),
+    },
+    {
+      label: 'Users balance for all time',
+      value: source.totalBalanceForAllTime.toFixed(),
+    },
+  ];
 };
 
 export default () => async (req, res) => {
@@ -62,93 +111,21 @@ export default () => async (req, res) => {
     fields: [
       {
         label: 'Real users statistic',
-        fields: [
-          {
-            label: 'Profit',
-            value: realUsersStatistic.profit.toFixed(),
-          },
-          {
-            label: 'Users paid',
-            value: realUsersStatistic.totalPaid.toFixed(),
-          },
-          {
-            label: 'Users won',
-            value: realUsersStatistic.usersWon.toFixed(),
-          },
-          {
-            label: 'Users can withdraw without payments',
-            value: realUsersStatistic.usersCanWithdrawWithoutPayments.toFixed(),
-          },
-          {
-            label: 'Users can withdraw with payments',
-            value: realUsersStatistic.usersCanWithdrawWithPayments.toFixed(),
-          },
-          {
-            label: 'Users was able to withdraw without payments',
-            value: realUsersStatistic.usersWasAbleToWithdrawWithoutPayments.toFixed(),
-          },
-          {
-            label: 'Users was able to withdraw with payments',
-            value: realUsersStatistic.usersWasAbleToWithdrawWithPayments.toFixed(),
-          },
-          {
-            label: 'Bonuses issued',
-            value: realUsersStatistic.bonusesIssued.toFixed(),
-          },
-          {
-            label: 'Users balance for all time',
-            value: realUsersStatistic.totalBalanceForAllTime.toFixed(),
-          },
-        ],
+        fields: getUsersFileds({
+          source: realUsersStatistic,
+          gamesInProgress: gamesInProgressWithRealPlayers.length,
+        }),
       },
       {
         label: 'Bots statistic',
-        fields: [
-          {
-            label: 'Profit',
-            value: botsStatistic.profit.toFixed(),
-          },
-          {
-            label: 'Users paid',
-            value: botsStatistic.totalPaid.toFixed(),
-          },
-          {
-            label: 'Users won',
-            value: botsStatistic.usersWon.toFixed(),
-          },
-          {
-            label: 'Users which can withdraw without payments',
-            value: botsStatistic.usersCanWithdrawWithoutPayments.toFixed(),
-          },
-          {
-            label: 'Users which can withdraw with payments',
-            value: botsStatistic.usersCanWithdrawWithPayments.toFixed(),
-          },
-          {
-            label: 'Users was able to withdraw without payments',
-            value: botsStatistic.usersWasAbleToWithdrawWithoutPayments.toFixed(),
-          },
-          {
-            label: 'Users was able to withdraw with payments',
-            value: botsStatistic.usersWasAbleToWithdrawWithPayments.toFixed(),
-          },
-          {
-            label: 'Bonuses issued',
-            value: botsStatistic.bonusesIssued.toFixed(),
-          },
-          {
-            label: 'Users balance for all time',
-            value: botsStatistic.totalBalanceForAllTime.toFixed(),
-          },
-        ],
+        fields: getUsersFileds({
+          source: botsStatistic,
+          gamesInProgress: gamesInProgressWithBots.length,
+        }),
       },
       {
         label: 'Others',
         fields: [
-          {
-            label: 'Bots created',
-            value: getBots().length,
-          },
           {
             label: 'Games created',
             value: notExpiredGames.length,
@@ -156,14 +133,6 @@ export default () => async (req, res) => {
           {
             label: 'Games in progress',
             value: gamesInProgress.length,
-          },
-          {
-            label: 'Bots playing',
-            value: gamesInProgressWithBots.length,
-          },
-          {
-            label: 'Real players playing',
-            value: gamesInProgressWithRealPlayers.length,
           },
           {
             label: 'Tables',
