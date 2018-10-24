@@ -56,7 +56,7 @@ export const updateBots = async () => {
 export const generateWithdraw = () => ({
   amount: _.random(0, 300),
   status: 'done',
-  user: getRandomBot(),
+  user: getRandomBot() || {},
   createdAt: randomDate(moment().add(-1, 'days'), moment()),
 });
 export const updateWithdraws = () => {

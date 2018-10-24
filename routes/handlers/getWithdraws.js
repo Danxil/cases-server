@@ -6,7 +6,8 @@ import { MIN_WITHDRAWS_TO_SHOW } from '../../gameConfig';
 export default () => async (req, res) => {
   const filter = JSON.parse(req.query.filter);
   const history = await getHistory({ filter });
-  const fakeWithdrawsLength = history.length < MIN_WITHDRAWS_TO_SHOW && !filter.userId ?
+  const fakeWithdrawsLength = history.length < MIN_WITHDRAWS_TO_SHOW &&
+    JSON.parse(req.query.withFakes) ?
     MIN_WITHDRAWS_TO_SHOW - history.length :
     0;
   const fakeWithdraws = getWithdraws();
