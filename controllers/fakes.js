@@ -1,7 +1,9 @@
 import _ from 'lodash';
 import moment from 'moment';
+import rp from 'request-promise';
+import faker from 'faker';
 import { Op } from 'sequelize';
-import { MIN_WITHDRAWS_TO_SHOW, GAMES_IN_TABLE, TABLES_AMOUNT } from '../gameConfig';
+import { MIN_WITHDRAWS_TO_SHOW, GAMES_IN_TABLE, TABLES_AMOUNT, START_BOT_BALANCE } from '../gameConfig';
 
 let bots = [];
 let withdraws = [];
@@ -11,14 +13,27 @@ const randomDate = (start, end) => {
   );
 };
 
-export const generateBot = async () => {
-  const result = await global.db.User.create({ bot: true });
-  return result;
+export const generateBot = async ({ card }) => {
+  const user = await global.db.User.create({ bot: true });
+  if (card.gender === 'male') {
+    user.photo = card.picture.thumbnail;
+    faker.locale = _.sample(['en', 'ru']);
+    user.displayName = `${faker.name.firstName(0)} ${faker.name.lastName(0)}`;
+  } else {
+    faker.locale = 'en';
+    user.displayName = `${faker.helpers.contextualCard().username.slice(0, _.random(5, 10))}`;
+  }
+  user.balance = START_BOT_BALANCE;
+  return user;
 };
 
 export const generateBots = async (amount) => {
+  const fakePersons = await rp({
+    uri: `https://randomuser.me/api/?results=${amount}&inc=gender,name,picture`,
+    json: true,
+  });
   const result = await Promise.all(
-    Array(amount).fill().map(() => generateBot()),
+    Array(amount).fill().map((o, index) => generateBot({ card: fakePersons.results[index] })),
   );
   return result;
 };

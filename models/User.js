@@ -1,8 +1,6 @@
 import Sequelize from 'sequelize';
-import faker from 'faker';
-import _ from 'lodash';
-import { MIN_AMOUNT_OF_WITHDRAWING, START_USER_BALANCE, START_BOT_BALANCE } from '../gameConfig';
-import fakePersons from '../fakePersons';
+
+import { MIN_AMOUNT_OF_WITHDRAWING, START_USER_BALANCE } from '../gameConfig';
 
 export default (sequelize) => {
   const User = sequelize.define('User', {
@@ -120,21 +118,6 @@ export default (sequelize) => {
     };
     await db.User.findOrCreate({ where: query, defaults: query });
   };
-
-  User.beforeValidate(async (user) => {
-    if (user.bot && !user.photo) {
-      const card = _.sample(fakePersons.results);
-      if (card.gender === 'male') {
-        user.photo = card.picture.thumbnail;
-        faker.locale = _.sample(['en', 'ru']);
-        user.displayName = `${faker.name.firstName(0)} ${faker.name.lastName(0)}`;
-      } else {
-        faker.locale = 'en';
-        user.displayName = `${faker.helpers.contextualCard().username.slice(0, _.random(5, 10))}`;
-      }
-      user.balance = START_BOT_BALANCE;
-    }
-  });
 
   User.prototype.verifyPassword = function (password) {
     return password === this.password;
