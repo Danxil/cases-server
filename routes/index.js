@@ -8,7 +8,7 @@ import getPurchases from './handlers/getPurchases';
 import createWithdrawHandler from './handlers/createWithdraw';
 import withdrawHandler from './handlers/createPurchase';
 import gameConfigHandler from './handlers/gameConfig';
-import confirmWelcomeHandler from './handlers/confirmWelcomeHandler';
+import confirmWelcomeHandler from './handlers/confirmWelcome';
 import getTablesHandler from './handlers/getTables';
 import getAdminStatistic from './handlers/getAdminStatistic';
 

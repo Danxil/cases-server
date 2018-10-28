@@ -52,15 +52,6 @@ export default (sequelize) => {
       type: Sequelize.FLOAT,
       defaultValue: START_USER_BALANCE,
       allowNull: false,
-      set(value) {
-        if (value >= MIN_AMOUNT_OF_WITHDRAWING) {
-          this.setDataValue('wasAbleToWithdraw', true);
-        }
-        if (this.isDemoMode && value >= START_USER_BALANCE * 3) {
-          this.setDataValue('isDemoMode', false);
-        }
-        this.setDataValue('balance', value);
-      },
     },
     paid: {
       type: Sequelize.FLOAT,
@@ -106,6 +97,15 @@ export default (sequelize) => {
       singular: 'user',
       plural: 'users',
     },
+  });
+
+  User.beforeUpdate(async (user) => {
+    if (user.balance >= MIN_AMOUNT_OF_WITHDRAWING) {
+      user.wasAbleToWithdraw = true;
+    }
+    if (user.isDemoMode && user.balance >= START_USER_BALANCE * 3) {
+      user.isDemoMode = false;
+    }
   });
 
   User.associate = (models) => {
