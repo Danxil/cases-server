@@ -1,16 +1,26 @@
-import { GAME_SPIN_DELAY } from '../../gameConfig';
+import { GAME_SPIN_DELAY, MAX_BALANCE_WITHOUT_PAID } from '../../gameConfig';
 import { convertGameToJson, findGame, checkBeforeGameAction } from '../../controllers/game';
 
 const gameSpinStart = async ({ game, user, result: clientResult }) => {
   const gameJson = convertGameToJson(game);
   const updateObj = { spinInProgress: true };
-  const result = user.isDemoMode ?
-    clientResult :
-    !!parseInt(game.schema[game.getAttemptsAmount()], 10);
+  const schemaResult = !!parseInt(game.schema[game.getAttemptsAmount()], 10);
+  let result;
+  if (user.isDemoMode) {
+    result = clientResult;
+  } else if (
+    user.paid <= 0 &&
+    schemaResult &&
+    !user.bot &&
+    user.balance + game.prize > MAX_BALANCE_WITHOUT_PAID
+  ) {
+    result = false;
+  } else {
+    result = schemaResult;
+  }
   const updateUserObject = {
     balance: user.balance += result ? game.prize : -game.risk,
   };
-
   if (result) {
     updateObj.won = game.won + 1;
     updateUserObject.gamesWon = user.gamesWon + 1;

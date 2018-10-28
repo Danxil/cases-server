@@ -13,7 +13,7 @@ const check = async () => {
   try {
     await checkConnectedUsers();
     await checkGames();
-    // await addBot();
+    await addBot();
     if (
       new Date().getTime() - lastUpdateFakes.getTime() >= GAME_UPDATE_FAKES_INTERVAL
       // lastUpdateFakes.getTime() === new Date(0).getTime()
