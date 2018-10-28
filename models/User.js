@@ -56,6 +56,9 @@ export default (sequelize) => {
         if (value >= MIN_AMOUNT_OF_WITHDRAWING) {
           this.setDataValue('wasAbleToWithdraw', true);
         }
+        if (this.isDemoMode && value >= START_USER_BALANCE * 3) {
+          this.setDataValue('isDemoMode', false);
+        }
         this.setDataValue('balance', value);
       },
     },
@@ -78,12 +81,12 @@ export default (sequelize) => {
       defaultValue: false,
       allowNull: false,
     },
-    demoModeFinishedConfirmation: {
+    isDemoMode: {
       type: Sequelize.BOOLEAN,
-      defaultValue: false,
+      defaultValue: true,
       allowNull: false,
     },
-    demoModeActivatedConfirmation: {
+    welcomeConfirmed: {
       type: Sequelize.BOOLEAN,
       defaultValue: false,
       allowNull: false,

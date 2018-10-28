@@ -8,8 +8,7 @@ import getPurchases from './handlers/getPurchases';
 import createWithdrawHandler from './handlers/createWithdraw';
 import withdrawHandler from './handlers/createPurchase';
 import gameConfigHandler from './handlers/gameConfig';
-import demoModeFinishedConfirmationHandler from './handlers/demoModeFinishedConfirmation';
-import demoModeActivatedConfirmationHandler from './handlers/demoModeActivatedConfirmation';
+import confirmWelcomeHandler from './handlers/confirmWelcomeHandler';
 import getTablesHandler from './handlers/getTables';
 import getAdminStatistic from './handlers/getAdminStatistic';
 
@@ -39,8 +38,7 @@ export default ({ app }) => {
   app.get(`${process.env.API_PREFIX}/withdraws`, withdrawsHandler());
   app.post(`${process.env.API_PREFIX}/withdraws`, authorization, createWithdrawHandler());
   app.get(`${process.env.API_PREFIX}/game-config`, gameConfigHandler());
-  app.get(`${process.env.API_PREFIX}/demo-mode-finished-confirmation`, demoModeFinishedConfirmationHandler());
-  app.get(`${process.env.API_PREFIX}/demo-mode-activated-confirmation`, demoModeActivatedConfirmationHandler());
+  app.get(`${process.env.API_PREFIX}/confirm-welcome`, confirmWelcomeHandler());
   app.get(`${process.env.API_PREFIX}/tables`, getTablesHandler());
   app.get(`${process.env.API_PREFIX}/admin-statistic`, authorization, isAdmin, getAdminStatistic());
   app.get('/*', (req, res) => {

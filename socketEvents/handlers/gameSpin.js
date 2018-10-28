@@ -1,10 +1,12 @@
 import { GAME_SPIN_DELAY } from '../../gameConfig';
 import { convertGameToJson, findGame, checkBeforeGameAction } from '../../controllers/game';
 
-const gameSpinStart = async ({ game, user }) => {
+const gameSpinStart = async ({ game, user, result: clientResult }) => {
   const gameJson = convertGameToJson(game);
   const updateObj = { spinInProgress: true };
-  const result = !!parseInt(game.schema[game.getAttemptsAmount()], 10);
+  const result = user.isDemoMode ?
+    clientResult :
+    !!parseInt(game.schema[game.getAttemptsAmount()], 10);
   const updateUserObject = {
     balance: user.balance += result ? game.prize : -game.risk,
   };
@@ -51,14 +53,14 @@ export default async ({
   user,
   botMode = false,
 }) => {
-  const { gameId } = payload;
+  const { gameId, result } = payload;
   const game = await findGame({ gameId });
   const checkResult = await checkBeforeGameAction({ user, game });
   if (!checkResult) return;
   const {
     updatedUser,
     updatedGame,
-  } = await gameSpinStart({ game, user });
+  } = await gameSpinStart({ game, user, result });
   await new Promise(resolve => setTimeout(resolve, GAME_SPIN_DELAY));
   await gameSpinDone({
     payload,
