@@ -14,13 +14,10 @@ const check = async () => {
     await checkConnectedUsers();
     await checkGames();
     await addBot();
-    console.log(1, new Date().getTime());
-    console.log(2, lastUpdateFakes.getTime());
     if (
       new Date().getTime() - lastUpdateFakes.getTime() >= GAME_UPDATE_FAKES_INTERVAL
       // lastUpdateFakes.getTime() === new Date(0).getTime()
     ) {
-      console.log(3);
       await updateFakes();
       lastUpdateFakes = new Date();
     }

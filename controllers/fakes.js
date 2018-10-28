@@ -63,6 +63,9 @@ export const updateBots = async () => {
   const botsToCreate = !bots.length ?
     Math.round((GAMES_IN_TABLE * TABLES_AMOUNT) / 2) - amountOfDeletedBots :
     amountOfDeletedBots;
+  console.log('bots.length', bots.length);
+  console.log('amountOfDeletedBots', amountOfDeletedBots);
+  console.log('botsToCreate', botsToCreate);
   const remainedBots = bots.filter(o => botsInProgressIds.indexOf(o.id) !== -1);
   const newBots = await generateBots(botsToCreate);
   bots = [...remainedBots, ...newBots];
