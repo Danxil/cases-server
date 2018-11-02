@@ -18,7 +18,7 @@ const app = express();
 if (process.env.NODE_ENV === 'production') app.use(expressSslify.HTTPS({ trustProtoHeader: true }));
 
 configureDb().then(async (db) => {
-  // await db.Game.truncate();
+  await db.Game.truncate();
   await db.User.destroy({ where: { bot: true } });
   app.use(cors({
     origin: process.env.CLIENT_BASE_URL.split(','),

@@ -61,10 +61,6 @@ export const expireGame = async ({ game }) => {
 };
 
 export const checkAndExpireNotExpiredGame = async ({ game }) => {
-  if (game.id === 164426) {
-    console.log('game.isMaxAttemptsReached()', game.isMaxAttemptsReached());
-    console.log('2', moment(game.updatedAt).add(GAME_CHECK_DELLAY, 'ms').format() <= moment().format());
-  }
   if (game.spinInProgress) return {};
   if (
     game.isMaxAttemptsReached() &&
