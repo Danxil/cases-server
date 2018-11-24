@@ -21,11 +21,10 @@ const check = async () => {
       await updateFakes();
       lastUpdateFakes = new Date();
     }
-
-    setTimeout(check, GAME_CHECK_INTERVAL);
   } catch (e) {
     console.log(e);
   }
+  setTimeout(check, GAME_CHECK_INTERVAL);
 };
 
 export default async () => {
