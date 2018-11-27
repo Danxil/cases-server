@@ -5,7 +5,7 @@ export const getHistory = async ({ filter }) => {
   });
   return history;
 };
-export const createWithdraw = async ({ amount, userId }) => {
-  const withdraw = await global.db.Withdraw.create({ amount, userId });
+export const createWithdraw = async ({ amount, userId, method, requisite }) => {
+  const withdraw = await global.db.Withdraw.create({ amount, userId, method, requisite });
   return withdraw;
 };

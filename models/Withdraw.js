@@ -11,6 +11,14 @@ export default (sequelize) => {
       type: Sequelize.FLOAT,
       allowNull: false,
     },
+    method: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
+    requisite: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
   }, {
     name: {
       singular: 'withdraw',
