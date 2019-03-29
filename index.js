@@ -1,5 +1,5 @@
 import express from 'express';
-import expressSslify from 'express-sslify';
+// import expressSslify from 'express-sslify';
 import passport from 'passport';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
@@ -15,7 +15,7 @@ import WS from './services/ws';
 import initData from './socketEvents/handlers/initData';
 
 const app = express();
-if (process.env.NODE_ENV === 'production') app.use(expressSslify.HTTPS({ trustProtoHeader: true }));
+// if (process.env.NODE_ENV === 'production') app.use(expressSslify.HTTPS({ trustProtoHeader: true }));
 
 configureDb().then(async (db) => {
   await db.Game.truncate();
