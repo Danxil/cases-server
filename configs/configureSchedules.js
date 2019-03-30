@@ -10,21 +10,21 @@ import {
 let lastUpdateFakes = new Date(0);
 
 const check = async () => {
-  try {
-    await checkConnectedUsers();
-    await checkGames();
-    await addBot();
-    if (
-      new Date().getTime() - lastUpdateFakes.getTime() >= GAME_UPDATE_FAKES_INTERVAL
-      // lastUpdateFakes.getTime() === new Date(0).getTime()
-    ) {
-      await updateFakes();
-      lastUpdateFakes = new Date();
-    }
-  } catch (e) {
-    console.log(e);
-  }
-  setTimeout(check, GAME_CHECK_INTERVAL);
+  // try {
+  //   await checkConnectedUsers();
+  //   await checkGames();
+  //   await addBot();
+  //   if (
+  //     new Date().getTime() - lastUpdateFakes.getTime() >= GAME_UPDATE_FAKES_INTERVAL
+  //     // lastUpdateFakes.getTime() === new Date(0).getTime()
+  //   ) {
+  //     await updateFakes();
+  //     lastUpdateFakes = new Date();
+  //   }
+  // } catch (e) {
+  //   console.log(e);
+  // }
+  // setTimeout(check, GAME_CHECK_INTERVAL);
 };
 
 export default async () => {
