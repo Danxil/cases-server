@@ -1,3 +1,5 @@
+// export const GAME_MIN_ALIVE_GAMES_AMOUNT = 1;
+export const GAME_USER_TIMEOUT = 15000;
 export const GAME_SPIN_DELAY = 8000;
 export const GAME_CHECK_DELLAY = 1000;
 export const GAME_MIN_CHANCE_TO_WIN = 5;
@@ -20,6 +22,7 @@ export const MIN_CHANCE_TO_WIN = 5;
 export const MAX_CHANCE_TO_WIN = 95;
 export const MIN_AMOUNT_OF_PURCHASE = 100;
 export const MAX_AMOUNT_OF_PURCHASE = 10000;
+export const COINS_RATE = 0.01;
 export const LOW_LEVEL_GAME_PRIZE_TRESHOLD = 50;
 export const TABLES_AMOUNT = 20;
 export const TABLES_STEP = 1000;
@@ -36,6 +39,7 @@ export default {
   MAX_AMOUNT_OF_PURCHASE,
   GAME_SPIN_DELAY,
   START_USER_BALANCE,
+  COINS_RATE,
   GAME_MIN_PRIZE,
   GAME_MAX_PRIZE,
   MAX_BALANCE_WITHOUT_PAID,
